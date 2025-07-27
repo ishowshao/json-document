@@ -1,8 +1,6 @@
 <template>
   <div class="array-control" :style="controlStyle">
-    <button class="control-btn add-btn" title="Add new item" @click.stop="addItem">
-      +
-    </button>
+    <button class="control-btn add-btn" title="Add new item" @click.stop="addItem">+</button>
     <button
       v-if="isItem"
       class="control-btn remove-btn"

@@ -1,9 +1,5 @@
 <template>
-  <div
-    style="position: relative"
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false"
-  >
+  <div style="position: relative" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
     <ArrayControl
       v-if="isHovering && arrayContext"
       :array-path="arrayContext.arrayPath"

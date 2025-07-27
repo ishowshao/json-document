@@ -61,8 +61,11 @@ export const useDocumentStore = defineStore('document', {
 
       try {
         console.log('🏪 DocumentStore - Starting patch application')
-        console.log('🏪 DocumentStore - Original document:', JSON.parse(JSON.stringify(this.document)))
-        
+        console.log(
+          '🏪 DocumentStore - Original document:',
+          JSON.parse(JSON.stringify(this.document)),
+        )
+
         // Clone the current document
         const clonedDocument = deepClone(this.document)
 
@@ -70,8 +73,11 @@ export const useDocumentStore = defineStore('document', {
         const patchArray = Array.isArray(patch) ? patch : [patch]
         console.log('🏪 DocumentStore - Applying patch array:', patchArray)
         applyPatch(clonedDocument, patchArray)
-        
-        console.log('🏪 DocumentStore - Document after patch application:', JSON.parse(JSON.stringify(clonedDocument)))
+
+        console.log(
+          '🏪 DocumentStore - Document after patch application:',
+          JSON.parse(JSON.stringify(clonedDocument)),
+        )
 
         // If we have a document schema, validate the result
         if (this.documentSchema) {

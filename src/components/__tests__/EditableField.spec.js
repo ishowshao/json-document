@@ -5,23 +5,23 @@ import EditableField from '../EditableField.vue'
 
 describe('EditableField', () => {
   it('renders the value correctly', () => {
-    const wrapper = mount(EditableField, { 
-      props: { 
-        path: '/test', 
+    const wrapper = mount(EditableField, {
+      props: {
+        path: '/test',
         value: 'Test Value',
-        editorConfig: 'input'
-      } 
+        editorConfig: 'input',
+      },
     })
     expect(wrapper.text()).toContain('Test Value')
   })
 
   it('populates input with current value when editing starts', async () => {
-    const wrapper = mount(EditableField, { 
-      props: { 
-        path: '/test', 
+    const wrapper = mount(EditableField, {
+      props: {
+        path: '/test',
         value: 'Initial Value',
-        editorConfig: 'input'
-      } 
+        editorConfig: 'input',
+      },
     })
 
     // Click to start editing
@@ -34,12 +34,12 @@ describe('EditableField', () => {
   })
 
   it('emits update event with patch when value changes', async () => {
-    const wrapper = mount(EditableField, { 
-      props: { 
-        path: '/test', 
+    const wrapper = mount(EditableField, {
+      props: {
+        path: '/test',
         value: 'Original',
-        editorConfig: 'input'
-      } 
+        editorConfig: 'input',
+      },
     })
 
     // Start editing
@@ -59,7 +59,7 @@ describe('EditableField', () => {
     expect(updateEvent).toEqual({
       op: 'replace',
       path: '/test',
-      value: 'Modified'
+      value: 'Modified',
     })
   })
 })

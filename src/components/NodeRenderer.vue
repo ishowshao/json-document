@@ -128,40 +128,26 @@ const staticAfter = computed(() => {
 })
 
 // Helper functions
-function pointerToJSONPath(pointer) {
-  if (pointer === '/' || pointer === '') return '$'
-
-  const segments = pointer.split('/').slice(1)
-  let path = '$'
-
-  for (const segment of segments) {
-    if (/^\d+$/.test(segment)) {
-      path += `[${segment}]`
-    } else {
-      path += `.${segment}`
-    }
-  }
-
-  return path
-}
-
 function matchesPattern(rulePattern, pointer) {
-  try {
-    // Convert JSON Pointer to JSONPath-like format for comparison
-    let pathToCheck = pointerToJSONPath(pointer)
+  if (!documentStore.document) return false
 
-    // Handle array patterns like $.authors[*]
-    if (rulePattern.includes('[*]')) {
-      // Create a regex pattern that matches specific indices for [*]
-      const regexPattern = rulePattern.replace(/\./g, '\\.').replace(/\[\*\]/g, '\\[\\d+\\]')
-      const regex = new RegExp('^' + regexPattern + '$')
-      return regex.test(pathToCheck)
+  try {
+    // The `jsonpath` library's `nodes` method returns an array of nodes,
+    // each with a `path` property like ['$', 'prop', 0, 'name'].
+    // We need to convert this array to a standard JSON Pointer string like '/prop/0/name'.
+    const jsonPathToJSONPointer = (pathArray) => {
+      if (!pathArray || pathArray.length <= 1) {
+        return '/'
+      }
+      return '/' + pathArray.slice(1).join('/')
     }
 
-    // Direct pattern matching for exact paths
-    return pathToCheck === rulePattern
+    const matchingNodes = JSONPath.nodes(documentStore.document, rulePattern)
+    const matchingPointers = matchingNodes.map((node) => jsonPathToJSONPointer(node.path))
+
+    return matchingPointers.includes(pointer)
   } catch (error) {
-    console.warn('Pattern matching error:', error)
+    console.warn(`Error matching JSONPath rule '${rulePattern}' for pointer '${pointer}':`, error)
     return false
   }
 }

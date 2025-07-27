@@ -4,11 +4,7 @@
     <header class="top-bar">
       <div class="top-bar-content">
         <h1>JSON Document System - Test Page</h1>
-        <button 
-          @click="manualRefresh" 
-          class="refresh-btn"
-          :disabled="!canRefresh"
-        >
+        <button @click="manualRefresh" class="refresh-btn" :disabled="!canRefresh">
           🔄 Refresh
         </button>
       </div>
@@ -163,12 +159,14 @@ const canRefresh = computed(() => {
 })
 
 function manualRefresh() {
+  debugger
   updateJsonData()
   updateSchema()
 }
 
 // HTML structure display
 const htmlStructure = computed(() => {
+  console.log('htmlStructure', parsedJsonData.value, parsedSchema.value)
   if (!parsedJsonData.value || !parsedSchema.value) return 'No valid data to display'
 
   // This will be populated by the JsonDocument component

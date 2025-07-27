@@ -19,7 +19,7 @@
       <NodeRenderer
         v-for="(item, index) in dataNode"
         :key="index"
-        :path="`${path}/${index}`"
+        :path="path === '/' ? `/${index}` : `${path}/${index}`"
         :schema="schema"
         @update="handleUpdate"
       />
@@ -29,7 +29,7 @@
       <NodeRenderer
         v-for="(value, key) in dataNode"
         :key="key"
-        :path="`${path}/${key}`"
+        :path="path === '/' ? `/${key}` : `${path}/${key}`"
         :schema="schema"
         @update="handleUpdate"
       />
@@ -44,7 +44,7 @@
 
 <script setup>
 import { computed, inject } from 'vue'
-import { JSONPath } from 'jsonpath'
+import JSONPath from 'jsonpath'
 import EditableField from './EditableField.vue'
 
 const props = defineProps({

@@ -14,7 +14,8 @@
     v-else
     :is="editorComponent"
     ref="editorRef"
-    v-model="internalValue"
+    :value="internalValue"
+    @input="internalValue = $event.target.value"
     class="editor-active"
     @blur="finishEditing"
     @keydown.enter.prevent="finishEditing"
@@ -46,7 +47,7 @@ const emit = defineEmits(['update'])
 // Component state
 const isEditing = ref(false)
 const isHovering = ref(false)
-const internalValue = ref(null)
+const internalValue = ref(props.value) // Initialize with current value
 const editorRef = ref(null)
 
 // Display value
@@ -88,13 +89,15 @@ const editorProps = computed(() => {
 
 // Editing functions
 function startEditing() {
-  internalValue.value = props.value
+  // Ensure internal value is set to current prop value
+  internalValue.value = displayValue.value
   isEditing.value = true
   isHovering.value = false
 
   nextTick(() => {
     if (editorRef.value) {
       editorRef.value.focus()
+      // Select all text for easy replacement
       if (editorRef.value.select) {
         editorRef.value.select()
       }
@@ -146,6 +149,7 @@ watch(
       internalValue.value = newValue
     }
   },
+  { immediate: true },
 )
 </script>
 

@@ -83,6 +83,9 @@ Presentation Schema 是一个 JSON 对象，它定义了数据与其表现形式
       "tag": "li",
       "editor": "input"
     },
+    "$.paragraphs[*]": {
+      "tag": "section"
+    },
     "$.paragraphs[*].title": {
         "tag": "h2",
         "editor": "input"

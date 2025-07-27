@@ -37,7 +37,10 @@
     "test:unit": "vitest",
     "test:e2e": "playwright test",
     "format": "prettier --write src/",
-    "prepublishOnly": "npm run build:lib"
+    "prepublishOnly": "npm run build:lib",
+    "dev:lib": "npm run build:lib && echo '✅ 组件库已更新'",
+    "link:global": "npm run build:lib && npm link && echo '🔗 全局链接已创建'",
+    "unlink:global": "npm unlink -g vue-json-document && echo '🔓 全局链接已移除'"
   },
   "dependencies": {
     "fast-json-patch": "^3.1.1",

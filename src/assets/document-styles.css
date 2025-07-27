@@ -52,6 +52,10 @@
   padding-left: 2em;
 }
 
+.json-document ul {
+  list-style-type: disc; /* 添加实心圆点 */
+}
+
 .json-document li > ul,
 .json-document li > ol {
   margin-top: 0.25em;

@@ -1,51 +1,65 @@
 <template>
-  <!-- Static content before -->
-  <template v-for="item in staticBefore" :key="`before-${item.tag}-${item.content}`">
-    <component :is="item.tag">{{ item.content }}</component>
-  </template>
+  <div
+    style="position: relative"
+    @mouseenter="isHovering = true"
+    @mouseleave="isHovering = false"
+  >
+    <ArrayControl
+      v-if="isHovering && arrayContext"
+      :array-path="arrayContext.arrayPath"
+      :item-path="arrayContext.itemPath"
+      @patch="handleUpdate"
+    />
 
-  <component :is="renderTag" v-bind="tagAttributes">
-    <!-- Main content -->
-    <template v-if="isLeaf">
-      <EditableField
-        :path="path"
-        :value="dataNode"
-        :editor-config="matchingRule?.editor"
-        @update="handleUpdate"
-      />
-    </template>
+    <component :is="renderTag" v-bind="tagAttributes">
+      <!-- Static content before -->
+      <template v-for="item in staticBefore" :key="`before-${item.tag}-${item.content}`">
+        <component :is="item.tag">{{ item.content }}</component>
+      </template>
 
-    <template v-else-if="isArray">
-      <NodeRenderer
-        v-for="(item, index) in dataNode"
-        :key="index"
-        :path="path === '/' ? `/${index}` : `${path}/${index}`"
-        :schema="schema"
-        @update="handleUpdate"
-      />
-    </template>
+      <!-- Main content -->
+      <template v-if="isLeaf">
+        <EditableField
+          :path="path"
+          :value="dataNode"
+          :editor-config="matchingRule?.editor"
+          @update="handleUpdate"
+        />
+      </template>
 
-    <template v-else-if="isObject">
-      <NodeRenderer
-        v-for="(value, key) in dataNode"
-        :key="key"
-        :path="path === '/' ? `/${key}` : `${path}/${key}`"
-        :schema="schema"
-        @update="handleUpdate"
-      />
-    </template>
-  </component>
+      <template v-else-if="isArray">
+        <NodeRenderer
+          v-for="(item, index) in dataNode"
+          :key="index"
+          :path="path === '/' ? `/${index}` : `${path}/${index}`"
+          :schema="schema"
+          @update="handleUpdate"
+        />
+      </template>
 
-  <!-- Static content after -->
-  <template v-for="item in staticAfter" :key="`after-${item.tag}-${item.content}`">
-    <component :is="item.tag">{{ item.content }}</component>
-  </template>
+      <template v-else-if="isObject">
+        <NodeRenderer
+          v-for="(value, key) in dataNode"
+          :key="key"
+          :path="path === '/' ? `/${key}` : `${path}/${key}`"
+          :schema="schema"
+          @update="handleUpdate"
+        />
+      </template>
+
+      <!-- Static content after -->
+      <template v-for="item in staticAfter" :key="`after-${item.tag}-${item.content}`">
+        <component :is="item.tag">{{ item.content }}</component>
+      </template>
+    </component>
+  </div>
 </template>
 
 <script setup>
-import { computed, inject } from 'vue'
+import { computed, inject, ref } from 'vue'
 import JSONPath from 'jsonpath'
 import EditableField from './EditableField.vue'
+import ArrayControl from './ArrayControl.vue'
 
 const props = defineProps({
   path: {
@@ -61,6 +75,7 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const documentStore = inject('documentStore')
+const isHovering = ref(false)
 
 // Get the data node at the current path
 const dataNode = computed(() => {
@@ -125,6 +140,26 @@ const staticBefore = computed(() => {
 
 const staticAfter = computed(() => {
   return layoutRule.value?.static?.after || []
+})
+
+// Array context detection
+const arrayContext = computed(() => {
+  // Case 1: The current node is an array.
+  if (isArray.value) {
+    return { arrayPath: props.path, itemPath: null }
+  }
+
+  // Case 2: The parent of the current node is an array.
+  const pathSegments = props.path.split('/').filter(Boolean)
+  if (pathSegments.length > 0) {
+    const parentPath = '/' + pathSegments.slice(0, -1).join('/')
+    const parentNode = documentStore.getNodeByPointer(parentPath)
+    if (Array.isArray(parentNode)) {
+      return { arrayPath: parentPath, itemPath: props.path }
+    }
+  }
+
+  return null
 })
 
 // Helper functions

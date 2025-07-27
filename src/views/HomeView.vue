@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import { z } from 'zod'
 import JsonDocument from '@/components/JsonDocument.vue'
 
@@ -117,18 +117,20 @@ const parsedJsonData = ref(null)
 const parsedSchema = ref(null)
 
 // Document schema for validation
-const documentSchema = z.object({
-  title: z.string().min(1),
-  authors: z.array(z.string()),
-  paragraphs: z
-    .array(
-      z.object({
-        title: z.string(),
-        description: z.string().optional(),
-      }),
-    )
-    .min(1),
-})
+const documentSchema = markRaw(
+  z.object({
+    title: z.string().min(1),
+    authors: z.array(z.string()),
+    paragraphs: z
+      .array(
+        z.object({
+          title: z.string(),
+          description: z.string().optional(),
+        }),
+      )
+      .min(1),
+  }),
+)
 
 // Update functions
 function updateJsonData() {

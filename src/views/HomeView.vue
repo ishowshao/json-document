@@ -153,7 +153,6 @@ const canRefresh = computed(() => {
 })
 
 function manualRefresh() {
-  debugger
   updateJsonData()
   updateSchema()
 }

@@ -4,6 +4,53 @@
 
 本文档阐述了构建 JSON Document 系统的技术方案。这是一个完全基于 Vue 3 生态系统构建的前端应用。其目标是为 JSON 数据创建一个动态的、由模式驱动的渲染器，并支持丰富的内联编辑功能。
 
+### 1.1. 核心示例
+
+为了更好地理解系统的目标，我们来看一个具体的例子。
+
+**源数据 (JSON):**
+```json
+{
+  "title": "文档系统",
+  "authors": [
+    "张三 (PM)"
+  ],
+  "paragraphs": [
+    {
+      "title": "概述",
+      "description": "灵活的文档系统"
+    },
+    {
+      "title": "快速上手",
+      "description": "灵活的文档系统"
+    }
+  ]
+}
+```
+
+**最终渲染效果 (HTML):**
+```html
+<article>
+    <h1>文档系统</h1>
+    <address>
+      <h2>作者</h2>
+      <ul class="authors">
+        <li class="author">张三(PM)</li>
+      </ul>
+    </address>
+
+  <section id="overview">
+    <h2>概述</h2>
+    <p>灵活的文档系统</p>
+  </section>
+
+  <section id="getting-started">
+    <h2>快速上手</h2>
+    <p>灵活的文档系统</p>
+  </section>
+</article>
+```
+
 ## 2. 技术栈
 
 *   **框架**: [Vue 3](https://vuejs.org/) (使用组合式 API)

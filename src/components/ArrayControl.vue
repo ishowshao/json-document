@@ -1,9 +1,9 @@
 <template>
-  <div class="array-control" :style="controlStyle">
-    <button class="control-btn add-btn" title="Add new item" @click.stop="addItem">+</button>
+  <div class="absolute -top-1 -right-1 z-10 flex gap-1 bg-white border border-gray-300 rounded-2xl p-0.5 shadow-md transition-opacity duration-200">
+    <button class="flex items-center justify-center w-5 h-5 rounded-full border-none cursor-pointer text-sm font-bold text-white bg-green-600 hover:bg-green-700 transition-colors duration-200" title="Add new item" @click.stop="addItem">+</button>
     <button
       v-if="isItem"
-      class="control-btn remove-btn"
+      class="flex items-center justify-center w-5 h-5 rounded-full border-none cursor-pointer text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors duration-200"
       title="Remove this item"
       @click.stop="removeItem"
     >
@@ -32,16 +32,6 @@ const props = defineProps({
 const emit = defineEmits(['patch'])
 
 const isItem = computed(() => !!props.itemPath)
-
-// Basic styling to position the control box
-const controlStyle = computed(() => ({
-  position: 'absolute',
-  top: '-5px',
-  right: '-5px',
-  zIndex: 10,
-  display: 'flex',
-  gap: '4px',
-}))
 
 function addItem() {
   const documentSchema = documentStore.documentSchema
@@ -85,43 +75,4 @@ function removeItem() {
 </script>
 
 <style scoped>
-.array-control {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 16px;
-  padding: 2px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.2s ease-in-out;
-}
-
-.control-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.add-btn {
-  background-color: #28a745; /* Green */
-}
-
-.add-btn:hover {
-  background-color: #218838;
-}
-
-.remove-btn {
-  background-color: #dc3545; /* Red */
-}
-
-.remove-btn:hover {
-  background-color: #c82333;
-}
 </style>

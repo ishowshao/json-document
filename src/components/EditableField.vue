@@ -1,8 +1,8 @@
 <template>
   <span
     v-if="!isEditing"
-    class="editable-field"
-    :class="{ 'editable-hover': isHovering }"
+    class="inline-block min-w-5 min-h-5 cursor-pointer rounded-sm transition-all duration-200 hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300"
+    :class="{ 'bg-blue-50 outline outline-1 outline-blue-300': isHovering }"
     @click="startEditing"
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
@@ -16,7 +16,8 @@
     ref="editorRef"
     :value="internalValue"
     @input="internalValue = $event.target.value"
-    class="editor-active"
+    class="border-2 border-blue-500 rounded px-2 py-1 font-inherit text-inherit outline-none bg-white min-w-25 focus:border-blue-700 focus:shadow-lg focus:shadow-blue-100"
+    :class="{ 'resize-y w-50': editorComponent === 'textarea' }"
     @blur="finishEditing"
     @keydown.enter.prevent="finishEditing"
     @keydown.esc="cancelEditing"
@@ -155,39 +156,4 @@ watch(
 </script>
 
 <style scoped>
-.editable-field {
-  display: inline-block;
-  min-width: 20px;
-  min-height: 1.2em;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-.editable-field:hover,
-.editable-hover {
-  background: rgba(59, 130, 246, 0.1);
-  outline: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.editor-active {
-  border: 2px solid #3b82f6;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-family: inherit;
-  font-size: inherit;
-  outline: none;
-  background: white;
-  min-width: 100px;
-}
-
-.editor-active:focus {
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-textarea.editor-active {
-  resize: vertical;
-  width: 200px;
-}
 </style>

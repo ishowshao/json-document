@@ -25,7 +25,7 @@ describe('EditableField', () => {
     })
 
     // Click to start editing
-    await wrapper.find('.editable-field').trigger('click')
+    await wrapper.find('span').trigger('click')
     await nextTick()
 
     // Check that the input has the current value
@@ -43,7 +43,7 @@ describe('EditableField', () => {
     })
 
     // Start editing
-    await wrapper.find('.editable-field').trigger('click')
+    await wrapper.find('span').trigger('click')
     await nextTick()
 
     // Change the value

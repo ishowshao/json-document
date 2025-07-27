@@ -1,53 +1,53 @@
 <template>
-  <div class="test-page">
+  <div class="h-screen flex flex-col overflow-hidden">
     <!-- Top bar -->
-    <header class="top-bar">
-      <div class="top-bar-content">
-        <h1>JSON Document System - Test Page</h1>
-        <button @click="manualRefresh" class="refresh-btn" :disabled="!canRefresh">
+    <header class="bg-slate-700 text-white p-4">
+      <div class="flex justify-between items-center max-w-6xl mx-auto">
+        <h1 class="m-0 text-2xl">JSON Document System - Test Page</h1>
+        <button @click="manualRefresh" class="bg-blue-500 text-white border-none px-4 py-2 rounded cursor-pointer text-sm transition-colors duration-200 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60" :disabled="!canRefresh">
           🔄 Refresh
         </button>
       </div>
     </header>
 
     <!-- Main content area -->
-    <main class="main-content">
+    <main class="flex-1 flex gap-4 p-4 min-h-0 overflow-hidden">
       <!-- Left side -->
-      <div class="left-panel">
+      <div class="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
         <!-- JSON input -->
-        <div class="input-section">
-          <h3>JSON Data</h3>
+        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+          <h3 class="m-0 mb-2 text-slate-700 text-lg">JSON Data</h3>
           <textarea
             v-model="jsonInput"
-            class="json-input"
+            class="flex-1 border border-gray-300 rounded p-2 font-mono text-sm resize-none overflow-auto min-h-0"
             placeholder="Enter JSON data here..."
           ></textarea>
         </div>
 
         <!-- Presentation Schema input -->
-        <div class="input-section">
-          <h3>Presentation Schema</h3>
+        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+          <h3 class="m-0 mb-2 text-slate-700 text-lg">Presentation Schema</h3>
           <textarea
             v-model="schemaInput"
-            class="schema-input"
+            class="flex-1 border border-gray-300 rounded p-2 font-mono text-sm resize-none overflow-auto min-h-0"
             placeholder="Enter presentation schema here..."
           ></textarea>
         </div>
       </div>
 
       <!-- Right side -->
-      <div class="right-panel">
+      <div class="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
         <!-- Rendered HTML -->
-        <div class="output-section">
-          <h3>Rendered Output</h3>
-          <div class="rendered-output">
+        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+          <h3 class="m-0 mb-2 text-slate-700 text-lg">Rendered Output</h3>
+          <div class="flex-1 border border-gray-200 rounded p-4 overflow-auto bg-gray-50 min-h-0">
             <JsonDocument
               v-if="parsedJsonData && parsedSchema"
               :json-data="parsedJsonData"
               :presentation-schema="parsedSchema"
               :document-schema="documentSchema"
             />
-            <div v-else class="placeholder">
+            <div v-else class="text-gray-600 italic text-center p-8">
               Enter valid JSON data and presentation schema to see rendered output
             </div>
           </div>
@@ -174,130 +174,4 @@ updateSchema()
 </script>
 
 <style scoped>
-.test-page {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Prevent page scrolling */
-}
-
-.top-bar {
-  background: #2c3e50;
-  color: white;
-  padding: 1rem;
-}
-
-.top-bar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.top-bar h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.refresh-btn {
-  background: #3498db;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.refresh-btn:hover:not(:disabled) {
-  background: #2980b9;
-}
-
-.refresh-btn:disabled {
-  background: #7f8c8d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  min-height: 0; /* Crucial for nested flex + overflow */
-  overflow: hidden; /* Prevent main content from scrolling */
-}
-
-.left-panel,
-.right-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-height: 0; /* Allow shrinking */
-  overflow: hidden; /* Prevent panel scrolling */
-}
-
-.input-section,
-.output-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1rem;
-  min-height: 0; /* Allow shrinking */
-  overflow: hidden; /* Let child elements handle scrolling */
-}
-
-.input-section h3,
-.output-section h3 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.json-input,
-.schema-input {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 0.5rem;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.9rem;
-  resize: none;
-  overflow: auto; /* Enable scrolling for textareas */
-  min-height: 0; /* Allow shrinking */
-}
-
-.rendered-output {
-  flex: 1;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 1rem;
-  overflow: auto; /* Make this area scrollable */
-  background: #fafafa;
-  min-height: 0; /* Allow shrinking */
-}
-
-.placeholder {
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 2rem;
-}
-
-.html-structure {
-  flex: 1;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 1rem;
-  background: #f8f8f8;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.8rem;
-  overflow: auto;
-  white-space: pre-wrap;
-}
 </style>

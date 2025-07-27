@@ -164,4 +164,143 @@ Presentation Schema 是一个 JSON 对象，它定义了数据与其表现形式
     *   `useValueAs`: 对于像 `<img>` 这样的标签，指定用节点的值去填充哪个属性 (例如 `src`)。
 *   **`layout`**: 定义非节点本身（如容器、静态内容）的布局和结构。其键是标准的 JSON Pointer。
     *   `tag`: 为该路径下的内容创建一个容器标签 (例如为 `authors` 数组创建一个 `<ul>`)。
-    *   `static`: 定义在给定路径的 `before` (之前) 或 `after` (之后) 注入的静态内容。 
+    *   `static`: 定义在给定路径的 `before` (之前) 或 `after` (之后) 注入的静态内容。
+
+## 5. 核心算法设计
+
+为了更好地指导开发，以下是核心组件的详细算法和逻辑。
+
+### 5.1. `NodeRenderer.vue` (递归渲染器)
+
+该组件是系统的渲染核心，其任务是根据给定的数据路径（`path`）和 schema 决定如何渲染节点。
+
+**Props:**
+*   `path`: `String` (必需) - 指向当前节点在JSON文档中的JSON Pointer路径 (例如 `/` 或 `/paragraphs/0/title`)。
+*   `schema`: `Object` (必需) - 完整的 `presentation-schema` 对象。
+
+**核心逻辑 (伪代码):**
+
+```js
+// setup() or <script setup>
+
+// 1. 从 Store 获取当前路径的数据
+const dataNode = store.getNodeByPointer(props.path);
+
+// 2. 查找匹配的渲染规则 (关键)
+// 遍历 schema.rules，找到第一个匹配当前节点路径的规则
+const matchingRule = findFirst(schema.rules, (rule, jsonPath) => {
+  // 使用 JSONPath 库测试节点的 Pointer 是否匹配 JSONPath 表达式
+  return jsonPathLibrary.test(store.document, jsonPath, props.path);
+});
+
+// 3. 查找匹配的布局规则 (精确匹配)
+const layoutRule = schema.layout[props.path];
+
+// 4. 决定最终的 HTML 标签
+const renderTag = matchingRule?.tag || layoutRule?.tag || 'div'; // 默认使用 'div'
+
+// template
+
+// 1. 渲染静态内容 (前置)
+<template v-for="item in layoutRule?.static?.before">
+  <component :is="item.tag">{{ item.content }}</component>
+</template>
+
+// 2. 渲染主内容
+<component :is="renderTag">
+  // 情况 A: 叶子节点 (string, number, boolean)
+  <template v-if="isLeaf(dataNode)">
+    <EditableField
+      :path="props.path"
+      :value="dataNode"
+      :editor-config="matchingRule?.editor"
+    />
+  </template>
+
+  // 情况 B: 数组
+  <template v-else-if="isArray(dataNode)">
+    <NodeRenderer
+      v-for="(item, index) in dataNode"
+      :key="index"
+      :path="`${props.path}/${index}`"
+      :schema="props.schema"
+    />
+  </template>
+
+  // 情况 C: 对象
+  <template v-else-if="isObject(dataNode)">
+    <NodeRenderer
+      v-for="(value, key) in dataNode"
+      :key="key"
+      :path="`${props.path}/${key}`"
+      :schema="props.schema"
+    />
+  </template>
+</component>
+
+// 3. 渲染静态内容 (后置)
+<template v-for="item in layoutRule?.static?.after">
+  <component :is="item.tag">{{ item.content }}</component>
+</template>
+```
+
+### 5.2. `EditableField.vue` (内联编辑器)
+
+该组件负责管理单个值的“查看”和“编辑”两种状态的切换。
+
+**Props:**
+*   `path`: `String` (必需) - 值的JSON Pointer路径。
+*   `value`: `any` (必需) - 要显示的叶子节点值。
+*   `editor-config`: `String` (可选) - 定义要使用的编辑器 (如 `'input'`, `'textarea'`)。
+
+**核心逻辑 (伪代码):**
+
+```js
+// state
+const isEditing = ref(false);
+const internalValue = ref(null);
+
+// template
+<template v-if="!isEditing">
+  <span @click="startEditing" class="editable-region">
+    {{ props.value }}
+  </span>
+</template>
+<template v-else>
+  <component
+    :is="resolveEditorComponent(props.editorConfig)"
+    v-model="internalValue"
+    @blur="finishEditing"
+    @keydown.enter.prevent="finishEditing"
+    @keydown.esc="cancelEditing"
+  />
+</template>
+
+// script
+function startEditing() {
+  internalValue.value = props.value;
+  isEditing.value = true;
+  nextTick(() => { /* focus the input */ });
+}
+
+function finishEditing() {
+  if (internalValue.value !== props.value) {
+    const patch = {
+      op: 'replace',
+      path: props.path,
+      value: internalValue.value
+    };
+    emit('update', patch); // 向上层派发 patch
+  }
+  isEditing.value = false;
+}
+
+function cancelEditing() {
+  isEditing.value = false;
+}
+```
+
+### 5.3. 开发指导
+*   **`NodeRenderer.vue` 的关键**: 找到一个能判断 JSON Pointer 是否匹配 JSONPath 表达式的库。
+*   **`EditableField.vue` 的关键**: 使用动态组件 `<component :is="...">` 并处理好 `blur` 和键盘事件。
+*   **数据流**: 建议使用 Vue 3 的 `provide/inject` 将 `applyPatch` 方法从顶层组件注入，避免多层事件传递。 

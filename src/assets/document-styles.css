@@ -1,0 +1,73 @@
+/*
+ * Base styles for the rendered JSON document.
+ * These styles are scoped under the `.json-document` class to avoid
+ * interfering with the rest of the application UI.
+ */
+
+.json-document {
+  /* Font and line height settings for better readability */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.7;
+  color: #333;
+}
+
+.json-document h1,
+.json-document h2,
+.json-document h3,
+.json-document h4,
+.json-document h5,
+.json-document h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #111;
+}
+
+.json-document h1 {
+  font-size: 2.25em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.json-document h2 {
+  font-size: 1.75em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.json-document h3 {
+  font-size: 1.5em;
+}
+
+.json-document p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.json-document ul,
+.json-document ol {
+  margin-top: 0;
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.json-document li > ul,
+.json-document li > ol {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.json-document li {
+  margin-bottom: 0.5em;
+}
+
+.json-document section {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid #eee;
+}
+
+.json-document address {
+    font-style: normal;
+}

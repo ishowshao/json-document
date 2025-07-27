@@ -52,12 +52,6 @@
             </div>
           </div>
         </div>
-
-        <!-- HTML structure display -->
-        <div class="output-section">
-          <h3>HTML Structure</h3>
-          <pre class="html-structure">{{ htmlStructure }}</pre>
-        </div>
       </div>
     </main>
   </div>
@@ -183,6 +177,7 @@ updateSchema()
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevent page scrolling */
 }
 
 .top-bar {
@@ -230,7 +225,8 @@ updateSchema()
   display: flex;
   gap: 1rem;
   padding: 1rem;
-  overflow: hidden;
+  min-height: 0; /* Crucial for nested flex + overflow */
+  overflow: hidden; /* Prevent main content from scrolling */
 }
 
 .left-panel,
@@ -239,6 +235,8 @@ updateSchema()
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 0; /* Allow shrinking */
+  overflow: hidden; /* Prevent panel scrolling */
 }
 
 .input-section,
@@ -249,6 +247,8 @@ updateSchema()
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 1rem;
+  min-height: 0; /* Allow shrinking */
+  overflow: hidden; /* Let child elements handle scrolling */
 }
 
 .input-section h3,
@@ -267,6 +267,8 @@ updateSchema()
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.9rem;
   resize: none;
+  overflow: auto; /* Enable scrolling for textareas */
+  min-height: 0; /* Allow shrinking */
 }
 
 .rendered-output {
@@ -274,8 +276,9 @@ updateSchema()
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 1rem;
-  overflow: auto;
+  overflow: auto; /* Make this area scrollable */
   background: #fafafa;
+  min-height: 0; /* Allow shrinking */
 }
 
 .placeholder {

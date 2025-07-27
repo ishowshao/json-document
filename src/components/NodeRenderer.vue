@@ -1,10 +1,10 @@
 <template>
-  <component :is="renderTag" v-bind="tagAttributes">
-    <!-- Static content before -->
-    <template v-for="item in staticBefore" :key="`before-${item.tag}-${item.content}`">
-      <component :is="item.tag">{{ item.content }}</component>
-    </template>
+  <!-- Static content before -->
+  <template v-for="item in staticBefore" :key="`before-${item.tag}-${item.content}`">
+    <component :is="item.tag">{{ item.content }}</component>
+  </template>
 
+  <component :is="renderTag" v-bind="tagAttributes">
     <!-- Main content -->
     <template v-if="isLeaf">
       <EditableField
@@ -34,12 +34,12 @@
         @update="handleUpdate"
       />
     </template>
-
-    <!-- Static content after -->
-    <template v-for="item in staticAfter" :key="`after-${item.tag}-${item.content}`">
-      <component :is="item.tag">{{ item.content }}</component>
-    </template>
   </component>
+
+  <!-- Static content after -->
+  <template v-for="item in staticAfter" :key="`after-${item.tag}-${item.content}`">
+    <component :is="item.tag">{{ item.content }}</component>
+  </template>
 </template>
 
 <script setup>

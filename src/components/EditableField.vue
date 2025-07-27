@@ -114,6 +114,7 @@ function finishEditing() {
       value: convertValue(internalValue.value),
     }
 
+    console.log('📝 EditableField - Generated JSON Patch:', patch)
     emit('update', patch)
   }
 

@@ -60,27 +60,40 @@ export const useDocumentStore = defineStore('document', {
       }
 
       try {
+        console.log('🏪 DocumentStore - Starting patch application')
+        console.log('🏪 DocumentStore - Original document:', JSON.parse(JSON.stringify(this.document)))
+        
         // Clone the current document
         const clonedDocument = deepClone(this.document)
 
         // Apply the patch to the clone
         const patchArray = Array.isArray(patch) ? patch : [patch]
+        console.log('🏪 DocumentStore - Applying patch array:', patchArray)
         applyPatch(clonedDocument, patchArray)
+        
+        console.log('🏪 DocumentStore - Document after patch application:', JSON.parse(JSON.stringify(clonedDocument)))
 
         // If we have a document schema, validate the result
         if (this.documentSchema) {
+          console.log('🏪 DocumentStore - Validating with document schema...')
           const validationResult = this.documentSchema.safeParse(clonedDocument)
           if (!validationResult.success) {
+            console.log('❌ DocumentStore - Validation failed:', validationResult.error.message)
             this.errors.push(`Validation failed: ${validationResult.error.message}`)
             return false
           }
+          console.log('✅ DocumentStore - Document schema validation passed')
+        } else {
+          console.log('🏪 DocumentStore - No document schema provided, skipping validation')
         }
 
         // If validation passes (or no schema), update the document
         this.document = clonedDocument
         this.errors = []
+        console.log('🏪 DocumentStore - Document updated successfully in store')
         return true
       } catch (error) {
+        console.log('❌ DocumentStore - Error during patch application:', error.message)
         this.errors.push(`Patch application failed: ${error.message}`)
         return false
       }

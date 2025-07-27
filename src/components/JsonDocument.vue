@@ -74,9 +74,16 @@ function initializeDocument() {
 }
 
 function handleUpdate(patch) {
+  console.log('🔧 JsonDocument - Received patch:', patch)
+  console.log('📄 JsonDocument - Current document before patch:', JSON.parse(JSON.stringify(documentStore.document)))
+  
   const success = documentStore.applyPatch(patch)
-  if (!success) {
-    console.error('Failed to apply patch:', patch, documentStore.errors)
+  
+  if (success) {
+    console.log('✅ JsonDocument - Patch applied successfully!')
+    console.log('📄 JsonDocument - Updated document after patch:', JSON.parse(JSON.stringify(documentStore.document)))
+  } else {
+    console.error('❌ JsonDocument - Failed to apply patch:', patch, documentStore.errors)
   }
 }
 

@@ -68,7 +68,7 @@
 
 *   **`JsonDocument.vue` (总调度器)**
     *   **职责**: 最外层的容器组件。
-    *   **输入**: 接收源 `json-data` 对象和 `presentation-schema` 对象作为 props。
+    *   **输入**: 接收源 `json-data` 对象、`presentation-schema` 对象以及一个用于校验整体数据结构的 `document-schema` (Zod Schema) 作为 props。
     *   **功能**:
         *   使用 `json-data` 初始化一个 Pinia store。
         *   将数据和 schema 向下传递给渲染器。
@@ -99,7 +99,11 @@ Pinia store 将作为 JSON 文档的唯一事实来源 (Single Source of Truth)�
 *   **State (状态)**: `document: { ... }` - JSON 对象的当前状态。
 *   **Actions (操作)**:
     *   `setDocument(newDocument)`: 用于加载一份新文档。
-    *   `applyPatch(patch)`: 接收一个 JSON Patch 对象并将其应用到 `document` 状态上。这是唯一的变更机制，确保了状态变更的可预测性。
+    *   `applyPatch(patch)`: 接收一个 JSON Patch 对象。这是保证数据结构完整性的核心。它的执行逻辑如下：
+        1. 在内存中克隆当前的 `document` state，得到一个临时对象。
+        2. 将传入的 `patch` 应用到这个临时对象上。
+        3. 使用 `document-schema` (一个完整的 Zod schema) 对**整个临时对象**进行校验。
+        4. **只有当**整个临时对象都通过了结构校验，才用它来替换当前的 `document` state。否则，变更将被拒绝，原始 state 保持不变。
 
 ### 3.3. 数据流
 
@@ -162,6 +166,7 @@ Presentation Schema 是一个 JSON 对象，它定义了数据与其表现形式
     *   `tag`: 要为匹配到的每个节点渲染的 HTML 标签。
     *   `editor`: 一个用于映射到已注册的编辑器组件的键。
     *   `useValueAs`: 对于像 `<img>` 这样的标签，指定用节点的值去填充哪个属性 (例如 `src`)。
+    *   `validation`: (可选) 一个用于定义数据校验规则的对象，后续会基于它生成 Zod schema。
 *   **`layout`**: 定义非节点本身（如容器、静态内容）的布局和结构。其键是标准的 JSON Pointer。
     *   `tag`: 为该路径下的内容创建一个容器标签 (例如为 `authors` 数组创建一个 `<ul>`)。
     *   `static`: 定义在给定路径的 `before` (之前) 或 `after` (之后) 注入的静态内容。
@@ -303,4 +308,58 @@ function cancelEditing() {
 ### 5.3. 开发指导
 *   **`NodeRenderer.vue` 的关键**: 找到一个能判断 JSON Pointer 是否匹配 JSONPath 表达式的库。
 *   **`EditableField.vue` 的关键**: 使用动态组件 `<component :is="...">` 并处理好 `blur` 和键盘事件。
-*   **数据流**: 建议使用 Vue 3 的 `provide/inject` 将 `applyPatch` 方法从顶层组件注入，避免多层事件传递。 
+*   **数据流**: 建议使用 Vue 3 的 `provide/inject` 将 `applyPatch` 方法从顶层组件注入，避免多层事件传递。
+
+## 6. 数据校验 (分层校验策略)
+
+为了同时保证优秀的用户体验和绝对的数据安全，系统采用一种分层的校验策略，结合了对**字段值**的即时校验和对**文档结构**的最终校验。
+
+### 6.1. 第一层：字段级校验 (用于 UI 反馈)
+
+*   **目的**: 在用户输入时提供快速、即时的反馈。
+*   **机制**: `EditableField.vue` 组件会利用 `presentation-schema` 中定义的 `validation` 规则。
+*   **流程**:
+    1.  当用户完成编辑时 (`finishEditing`)，组件会根据规则构建一个临时的 Zod schema 来校验**当前输入的值**。
+    2.  如果校验失败（例如，email 字段格式错误），组件会立刻显示错误信息，并阻止生成 `patch` 指令。这确保了无效的**值**不会被提交。
+
+**`presentation-schema` 中的字段校验定义示例:**
+```json
+{
+  "$.paragraphs[*].title": {
+    "tag": "h2",
+    "editor": "input",
+    "validation": { // 用于字段级校验
+        "type": "string",
+        "min": 3,
+        "errorMessage": "标题至少需要3个字符。"
+    }
+  }
+}
+```
+
+### 6.2. 第二层：文档级校验 (用于数据完整性)
+
+*   **目的**: 保证任何变更（增、删、改）都不会破坏整个 JSON 文档的预定义结构。
+*   **机制**: 一个独立的、定义了完整文档结构的 Zod schema (`documentSchema`) 会被传入系统，并由 Pinia store 在最终环节使用。
+*   **流程**:
+    1.  Pinia store 的 `applyPatch` action 接收到一个 `patch` 指令。
+    2.  它首先在内存中克隆一份当前的 `document` state，并将 `patch` **预应用**到这份克隆上。
+    3.  然后，它使用 `documentSchema` 来校验**整个被修改后的克隆对象**。
+    4.  **只有当**克隆对象的整体结构完全合法时，这次变更才会被最终接受，并替换掉原始的 `document` state。
+    5.  如果校验失败（例如，一个必需的字段被 `remove`），整个操作将被安全地中止，原始数据保持不变。
+
+**`documentSchema` 示例 (一个独立的 Zod schema):**
+```javascript
+import { z } from 'zod';
+
+const documentSchema = z.object({
+  title: z.string().min(1),
+  authors: z.array(z.string()),
+  paragraphs: z.array(z.object({
+    title: z.string(),
+    description: z.string().optional()
+  })).min(1) // 例如，至少要有一个段落
+});
+```
+
+通过这种方式，我们实现了关注点分离：`presentation-schema` 关心**表现和值的格式**，而 `documentSchema` 关心**最终的结构完整性**。 

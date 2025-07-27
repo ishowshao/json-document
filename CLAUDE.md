@@ -38,22 +38,25 @@ npm run format
 
 ## Key Technical Components
 
-**Core Components to implement:**
+**Core Components:**
 - `JsonDocument.vue` - Main orchestrator, manages JSON data and presentation schema
 - `NodeRenderer.vue` - Recursive renderer that traverses JSON using JSONPath rules
 - `EditableField.vue` - Handles inline editing with hover/click interactions
+- `ArrayControl.vue` - Specialized component for handling array operations
 
-**State Management:**
-- Pinia store manages JSON document state
-- All edits generate JSON Patch operations (RFC 6902)
+**State Management (document.js store):**
+- Pinia store manages JSON document state with `getNodeByPointer()` for JSON Pointer navigation
+- All edits generate JSON Patch operations (RFC 6902) via `applyPatch()`
 - Two-layer validation: field-level (immediate feedback) + document-level (structural integrity)
+- Error tracking for validation failures and patch application errors
 
 **Key Dependencies:**
-- Vue 3 with Composition API
-- Pinia for state management
+- Vue 3 with Composition API and `provide/inject` for component communication
+- Pinia for centralized state management
 - JSONPath for data selection in presentation schemas
-- JSON Patch (fast-json-patch) for atomic updates
-- Zod for schema validation
+- JSON Patch (fast-json-patch) for atomic updates with `deepClone()` for safe mutations
+- Zod for schema validation with utility functions in `/src/utils/schema.js`
+- TailwindCSS v4 for styling
 
 ## Project Structure
 
@@ -62,6 +65,28 @@ npm run format
 - `/docs/` - Project requirements and technical specifications (Chinese)
 - `/e2e/` - Playwright end-to-end tests
 - `/src/components/__tests__/` - Vitest unit tests
+
+## Architectural Patterns
+
+**Rendering System:**
+- Uses JSON Pointer (RFC 6901) paths like `/title`, `/content/0/text` for precise data targeting
+- Presentation schemas define mapping rules using JSONPath expressions
+- Recursive component pattern: `NodeRenderer` calls itself for nested structures
+- Separation of concerns: data fetching, validation, and rendering are handled by different layers
+
+**Inline Editing Flow:**
+1. User hovers over editable content → visual feedback shows edit capability
+2. Click activates inline edit mode → field becomes editable control
+3. User edits → generates JSON Patch operation targeting specific JSON path
+4. Patch applied to store → triggers validation → updates document if valid
+5. UI re-renders with new data, maintaining cursor position and edit state
+
+**Data Flow:**
+```
+JSON Data + Presentation Schema → JsonDocument → NodeRenderer → EditableField
+                ↓
+            Pinia Store ← JSON Patch ← User Edits
+```
 
 ## Testing Strategy
 

@@ -45,7 +45,7 @@ export function generateDefaultFromSchema(schema) {
   }
 
   if (schema instanceof z.ZodString) {
-    return ''
+    return 'string'
   }
 
   if (schema instanceof z.ZodNumber) {

@@ -1,34 +1,66 @@
 {
-  "name": "json-doc",
-  "version": "0.0.0",
-  "private": true,
+  "name": "vue-json-document",
+  "version": "1.0.0",
+  "description": "A Vue 3 component library for dynamic JSON document rendering with inline editing capabilities",
+  "author": "Your Name",
+  "license": "MIT",
   "type": "module",
+  "main": "./dist/json-document.cjs.js",
+  "module": "./dist/json-document.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/json-document.es.js",
+      "require": "./dist/json-document.cjs.js"
+    },
+    "./dist/style.css": "./dist/vue-json-document.css"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "vue",
+    "vue3",
+    "json",
+    "document",
+    "editor",
+    "inline-editing",
+    "component-library"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:lib": "vite build --config vite.lib.config.js",
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.11",
     "fast-json-patch": "^3.1.1",
     "jsonpath": "^1.1.1",
-    "pinia": "^3.0.3",
-    "tailwindcss": "^4.1.11",
-    "vue": "^3.5.17",
-    "vue-router": "^4.5.1",
     "zod": "^4.0.10"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "pinia": "^3.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.1",
+    "@tailwindcss/vite": "^4.1.11",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^26.1.0",
+    "pinia": "^3.0.3",
     "prettier": "3.5.3",
+    "tailwindcss": "^4.1.11",
     "vite": "^7.0.0",
     "vite-plugin-vue-devtools": "^7.7.7",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1"
   }
 }

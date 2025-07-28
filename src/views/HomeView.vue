@@ -4,9 +4,26 @@
     <header class="bg-slate-700 text-white p-4">
       <div class="flex justify-between items-center max-w-6xl mx-auto">
         <h1 class="m-0 text-2xl">JSON Document System - Test Page</h1>
-        <button @click="manualRefresh" class="bg-blue-500 text-white border-none px-4 py-2 rounded cursor-pointer text-sm transition-colors duration-200 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60" :disabled="!canRefresh">
-          🔄 Refresh
-        </button>
+        <div class="flex gap-3 items-center">
+          <button
+            @click="toggleReadonlyMode"
+            class="border-none px-4 py-2 rounded cursor-pointer text-sm transition-colors duration-200"
+            :class="
+              readonly
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            "
+          >
+            {{ readonly ? '📖 只读模式' : '✏️ 编辑模式' }}
+          </button>
+          <button
+            @click="manualRefresh"
+            class="bg-blue-500 text-white border-none px-4 py-2 rounded cursor-pointer text-sm transition-colors duration-200 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="!canRefresh"
+          >
+            🔄 Refresh
+          </button>
+        </div>
       </div>
     </header>
 
@@ -15,7 +32,9 @@
       <!-- Left side -->
       <div class="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
         <!-- JSON input -->
-        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+        <div
+          class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden"
+        >
           <h3 class="m-0 mb-2 text-slate-700 text-lg">JSON Data</h3>
           <textarea
             v-model="jsonInput"
@@ -25,7 +44,9 @@
         </div>
 
         <!-- Presentation Schema input -->
-        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+        <div
+          class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden"
+        >
           <h3 class="m-0 mb-2 text-slate-700 text-lg">Presentation Schema</h3>
           <textarea
             v-model="schemaInput"
@@ -38,7 +59,9 @@
       <!-- Right side -->
       <div class="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
         <!-- Rendered HTML -->
-        <div class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden">
+        <div
+          class="flex-1 flex flex-col border border-gray-300 rounded p-4 min-h-0 overflow-hidden"
+        >
           <h3 class="m-0 mb-2 text-slate-700 text-lg">Rendered Output</h3>
           <div class="flex-1 border border-gray-200 rounded p-4 overflow-auto bg-gray-50 min-h-0">
             <JsonDocument
@@ -46,6 +69,7 @@
               :json-data="parsedJsonData"
               :presentation-schema="parsedSchema"
               :document-schema="documentSchema"
+              :readonly="readonly"
             />
             <div v-else class="text-gray-600 italic text-center p-8">
               Enter valid JSON data and presentation schema to see rendered output
@@ -61,6 +85,9 @@
 import { ref, computed, markRaw } from 'vue'
 import { z } from 'zod'
 import JsonDocument from '@/components/JsonDocument.vue'
+
+// Readonly mode state
+const readonly = ref(false)
 
 // Reactive inputs
 const jsonInput = ref(`{
@@ -159,6 +186,11 @@ function manualRefresh() {
   updateSchema()
 }
 
+// Toggle readonly mode
+function toggleReadonlyMode() {
+  readonly.value = !readonly.value
+}
+
 // HTML structure display
 const htmlStructure = computed(() => {
   console.log('htmlStructure', parsedJsonData.value, parsedSchema.value)
@@ -173,5 +205,4 @@ updateJsonData()
 updateSchema()
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

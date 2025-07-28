@@ -33,6 +33,10 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const documentStore = useDocumentStore()
@@ -96,6 +100,10 @@ function handleUpdate(patch) {
 // Provide the update function to child components
 provide('updateDocument', handleUpdate)
 provide('documentStore', documentStore)
+provide(
+  'readonly',
+  computed(() => props.readonly),
+)
 </script>
 
 <style scoped>

@@ -21,7 +21,7 @@ export {
   ArrayControl,
   useDocumentStore,
   schemaUtils,
-  docs
+  docs,
 }
 
 // Export as a plugin for Vue.use()
@@ -31,7 +31,7 @@ export default {
     app.component('NodeRenderer', NodeRenderer)
     app.component('EditableField', EditableField)
     app.component('ArrayControl', ArrayControl)
-  }
+  },
 }
 
 // Version info

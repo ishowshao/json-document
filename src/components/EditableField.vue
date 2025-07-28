@@ -1,11 +1,15 @@
 <template>
   <span
     v-if="!isEditing"
-    class="inline-block min-w-5 min-h-5 cursor-pointer rounded-sm transition-all duration-200 hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300"
-    :class="{ 'bg-blue-50 outline outline-1 outline-blue-300': isHovering }"
-    @click="startEditing"
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false"
+    class="inline-block min-w-5 min-h-5 rounded-sm"
+    :class="{
+      'cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300':
+        !readonly,
+      'bg-blue-50 outline outline-1 outline-blue-300': isHovering && !readonly,
+    }"
+    @click="!readonly && startEditing()"
+    @mouseenter="!readonly && (isHovering = true)"
+    @mouseleave="!readonly && (isHovering = false)"
   >
     {{ displayValue }}
   </span>
@@ -26,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, inject } from 'vue'
 
 const props = defineProps({
   path: {
@@ -44,6 +48,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update'])
+
+// Inject readonly state
+const readonly = inject('readonly', ref(false))
 
 // Component state
 const isEditing = ref(false)
@@ -90,6 +97,9 @@ const editorProps = computed(() => {
 
 // Editing functions
 function startEditing() {
+  // Do nothing if in readonly mode
+  if (readonly.value) return
+
   // Ensure internal value is set to current prop value
   internalValue.value = displayValue.value
   isEditing.value = true
@@ -155,5 +165,4 @@ watch(
 )
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

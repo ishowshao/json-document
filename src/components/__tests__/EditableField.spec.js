@@ -62,4 +62,90 @@ describe('EditableField', () => {
       value: 'Modified',
     })
   })
+
+  describe('readonly mode', () => {
+    it('renders without hover effects in readonly mode', () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            readonly: true,
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).not.toContain('cursor-pointer')
+      expect(span.classes()).not.toContain('hover:bg-blue-50')
+    })
+
+    it('does not enter edit mode when clicked in readonly mode', async () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            readonly: true,
+          },
+        },
+      })
+
+      // Click should not start editing
+      await wrapper.find('span').trigger('click')
+      await nextTick()
+
+      // Should not find any input element
+      expect(wrapper.find('input').exists()).toBe(false)
+      expect(wrapper.text()).toContain('Test Value')
+    })
+
+    it('does not show hover state in readonly mode', async () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            readonly: true,
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+
+      // Trigger mouseenter
+      await span.trigger('mouseenter')
+      await nextTick()
+
+      // Should not have hover classes
+      expect(span.classes()).not.toContain('bg-blue-50')
+      expect(span.classes()).not.toContain('outline')
+    })
+
+    it('still renders value correctly in readonly mode', () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Readonly Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            readonly: true,
+          },
+        },
+      })
+
+      expect(wrapper.text()).toContain('Readonly Value')
+    })
+  })
 })

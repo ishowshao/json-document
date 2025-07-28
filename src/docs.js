@@ -25,21 +25,20 @@ export async function openUsageDocs() {
     console.warn('openUsageDocs() 仅在Node.js环境中可用')
     return
   }
-  
+
   try {
     const { readFileSync } = await import('fs')
     const { resolve } = await import('path')
-    
+
     // 尝试读取文档
     const docPath = resolve(process.cwd(), 'node_modules/vue-json-document/docs/LIB_USAGE.md')
     const content = readFileSync(docPath, 'utf-8')
-    
+
     console.log('\n📚 Vue JSON Document 使用文档\n')
     console.log('文档路径:', docPath)
     console.log('\n内容预览:')
     console.log(content.substring(0, 500) + '...\n')
     console.log('💡 提示: 您可以在编辑器中打开上述路径查看完整文档')
-    
   } catch (error) {
     console.error('无法读取文档:', error.message)
     console.log('💡 请确保已正确安装 vue-json-document 包')
@@ -58,7 +57,7 @@ export function getQuickStartExample() {
     :presentation-schema="schema"
   />
 </template>`,
-    
+
     script: `<script setup>
 import { JsonDocument } from 'vue-json-document'
 import 'vue-json-document/dist/vue-json-document.css'
@@ -75,10 +74,10 @@ const schema = {
   }
 }
 </script>`,
-    
+
     install: 'npm install vue-json-document',
-    
-    description: '这是一个基本的使用示例，展示了如何设置JSON数据和展示模式'
+
+    description: '这是一个基本的使用示例，展示了如何设置JSON数据和展示模式',
   }
 }
 
@@ -111,5 +110,5 @@ export default {
   getDevDocsPath,
   openUsageDocs,
   getQuickStartExample,
-  showHelp
+  showHelp,
 }

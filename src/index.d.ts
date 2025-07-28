@@ -6,6 +6,7 @@ export interface JsonDocumentProps {
   jsonData: Record<string, any>
   presentationSchema: PresentationSchema
   documentSchema?: any
+  readonly?: boolean
 }
 
 export interface NodeRendererProps {

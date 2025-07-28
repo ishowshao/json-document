@@ -1,7 +1,11 @@
 <template>
-  <div style="position: relative" @mouseenter="isHovering = true" @mouseleave="isHovering = false">
+  <div
+    style="position: relative"
+    @mouseenter="!readonly && (isHovering = true)"
+    @mouseleave="!readonly && (isHovering = false)"
+  >
     <ArrayControl
-      v-if="isHovering && arrayContext"
+      v-if="!readonly && isHovering && arrayContext"
       :array-path="arrayContext.arrayPath"
       :item-path="arrayContext.itemPath"
       @patch="handleUpdate"
@@ -71,6 +75,7 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const documentStore = inject('documentStore')
+const readonly = inject('readonly', ref(false))
 const isHovering = ref(false)
 
 // Get the data node at the current path

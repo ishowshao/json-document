@@ -87,6 +87,12 @@ npm unlink -g vue-json-document
 
 ### 6. 常见问题
 
+**Q: `npm link vue-json-document` 报错 404 Not Found？**
+A: 这个错误通常出现但不影响功能！请检查：
+- 是否有软链接：`ls -la node_modules/ | grep vue-json-document`
+- 使用ES模块语法导入：`import { JsonDocument } from 'vue-json-document'`
+- 如果是CommonJS项目，需要用动态导入：`const m = await import('vue-json-document')`
+
 **Q: 修改代码后测试项目没有更新？**
 A: 重新运行 `npm run build:lib` 构建最新版本。
 
@@ -95,9 +101,20 @@ A: 确保：
 - 已运行 `npm run build:lib`
 - package.json 中的 main/module/exports 路径正确
 - 测试项目中正确导入了 CSS 文件
+- 使用正确的模块语法（ES或CommonJS）
 
 **Q: TypeScript 类型提示不工作？**
 A: 确保 `dist/index.d.ts` 文件存在且 package.json 中 types 字段配置正确。
+
+**Q: 导入时提示 Cannot read properties of undefined？**
+A: 使用ES模块语法：
+```javascript
+// ✅ 正确
+import { JsonDocument, docs } from 'vue-json-document'
+
+// ❌ 错误（在ES模块项目中）
+const { JsonDocument } = require('vue-json-document')
+```
 
 ### 7. 推荐的测试项目结构
 

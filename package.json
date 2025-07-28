@@ -14,6 +14,7 @@
       "import": "./dist/json-document.es.js",
       "require": "./dist/json-document.cjs.js"
     },
+    "./package.json": "./package.json",
     "./dist/style.css": "./dist/vue-json-document.css",
     "./docs/usage": "./docs/LIB_USAGE.md",
     "./docs/development": "./docs/LOCAL_DEVELOPMENT.md"
@@ -70,5 +71,16 @@
     "vitest": "^3.2.4",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
-  }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishowshao/json-document.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ishowshao/json-document/issues"
+  },
+  "homepage": "https://github.com/ishowshao/json-document#readme"
 }

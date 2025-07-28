@@ -44,6 +44,7 @@ export default {
     :json-data="jsonData"
     :presentation-schema="presentationSchema"
     :document-schema="documentSchema"
+    :readonly="false"
   />
 </template>
 
@@ -154,6 +155,13 @@ import type {
   JsonPatch 
 } from 'vue-json-document'
 
+const props: JsonDocumentProps = {
+  jsonData: {...},
+  presentationSchema: {...},
+  documentSchema: null,
+  readonly: false  // 新增 readonly 属性
+}
+
 const schema: PresentationSchema = {
   rules: {
     "$.title": {
@@ -162,6 +170,76 @@ const schema: PresentationSchema = {
     }
   }
 }
+```
+
+## 组件属性
+
+### JsonDocument Props
+
+| 属性名 | 类型 | 必需 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| `json-data` | `Object` | ✅ | - | 要渲染的 JSON 数据 |
+| `presentation-schema` | `Object` | ✅ | - | 展示模式配置 |
+| `document-schema` | `Object` | ❌ | `null` | 文档验证模式 (Zod Schema) |
+| `readonly` | `Boolean` | ❌ | `false` | 是否为只读模式 |
+
+### 只读模式
+
+当设置 `readonly: true` 时，文档将以只读模式渲染：
+
+```vue
+<template>
+  <!-- 只读模式 - 禁用所有编辑功能 -->
+  <JsonDocument
+    :json-data="jsonData"
+    :presentation-schema="presentationSchema"
+    :readonly="true"
+  />
+  
+  <!-- 编辑模式 - 默认行为 -->
+  <JsonDocument
+    :json-data="jsonData"
+    :presentation-schema="presentationSchema"
+    :readonly="false"
+  />
+</template>
+```
+
+**只读模式特性：**
+- ❌ 无 hover 编辑提示
+- ❌ 无法点击编辑字段
+- ❌ 无数组增删控制按钮
+- ✅ 保持完整的渲染功能
+- ✅ 适用于展示和打印场景
+
+**典型使用场景：**
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+
+const isEditMode = ref(false)
+const jsonData = ref({...})
+const presentationSchema = ref({...})
+
+// 根据用户权限或模式动态切换
+const readonly = computed(() => 
+  !isEditMode.value || !userHasEditPermission.value
+)
+</script>
+
+<template>
+  <div>
+    <button @click="isEditMode = !isEditMode">
+      {{ isEditMode ? '切换到查看模式' : '切换到编辑模式' }}
+    </button>
+    
+    <JsonDocument
+      :json-data="jsonData"
+      :presentation-schema="presentationSchema"
+      :readonly="readonly"
+    />
+  </div>
+</template>
 ```
 
 ## 高级配置

@@ -39,10 +39,10 @@ npm run format
 ## Key Technical Components
 
 **Core Components:**
-- `JsonDocument.vue` - Main orchestrator, manages JSON data and presentation schema
+- `JsonDocument.vue` - Main orchestrator, manages JSON data and presentation schema. Supports `readonly` prop to disable all editing features
 - `NodeRenderer.vue` - Recursive renderer that traverses JSON using JSONPath rules
-- `EditableField.vue` - Handles inline editing with hover/click interactions
-- `ArrayControl.vue` - Specialized component for handling array operations
+- `EditableField.vue` - Handles inline editing with hover/click interactions (disabled in readonly mode)
+- `ArrayControl.vue` - Specialized component for handling array operations (hidden in readonly mode)
 
 **State Management (document.js store):**
 - Pinia store manages JSON document state with `getNodeByPointer()` for JSON Pointer navigation
@@ -74,12 +74,18 @@ npm run format
 - Recursive component pattern: `NodeRenderer` calls itself for nested structures
 - Separation of concerns: data fetching, validation, and rendering are handled by different layers
 
-**Inline Editing Flow:**
+**Inline Editing Flow (when not in readonly mode):**
 1. User hovers over editable content → visual feedback shows edit capability
 2. Click activates inline edit mode → field becomes editable control
 3. User edits → generates JSON Patch operation targeting specific JSON path
 4. Patch applied to store → triggers validation → updates document if valid
 5. UI re-renders with new data, maintaining cursor position and edit state
+
+**Readonly Mode:**
+- When `readonly: true` is passed to `JsonDocument`, all editing features are disabled
+- No hover effects on editable fields
+- No array add/remove controls
+- Content is displayed in pure viewing mode
 
 **Data Flow:**
 ```

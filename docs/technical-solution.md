@@ -68,11 +68,12 @@
 
 *   **`JsonDocument.vue` (总调度器)**
     *   **职责**: 最外层的容器组件。
-    *   **输入**: 接收源 `json-data` 对象、`presentation-schema` 对象以及一个用于校验整体数据结构的 `document-schema` (Zod Schema) 作为 props。
+    *   **输入**: 接收源 `json-data` 对象、`presentation-schema` 对象、一个用于校验整体数据结构的 `document-schema` (Zod Schema) 以及 `readonly` 布尔值作为 props。
     *   **功能**:
         *   使用 `json-data` 初始化一个 Pinia store。
         *   将数据和 schema 向下传递给渲染器。
         *   监听编辑事件，并向 store 分发 action。
+        *   通过 `provide` 向子组件注入 `readonly` 状态，控制是否启用编辑功能。
 
 *   **`NodeRenderer.vue` (递归渲染器)**
     *   **职责**: 根据 Presentation Schema 递归地遍历 JSON 数据，并渲染出对应的 HTML 元素。
@@ -88,9 +89,10 @@
     *   **输入**: 要显示的 `value` (值)，指向该值的 `path` (路径)，以及从 schema 中获取的具体 `editor-config` (编辑器配置)。
     *   **功能**:
         *   以纯文本形式显示值。
-        *   `hover` (悬浮) 时，显示一个视觉提示 (例如边框)。
-        *   `click` (点击) 时，根据 `editor-config` 动态挂载正确的编辑组件 (例如 `<input>`, `textarea`, `ImageUploader.vue`)。
+        *   在非只读模式下，`hover` (悬浮) 时显示视觉提示 (例如边框)。
+        *   在非只读模式下，`click` (点击) 时根据 `editor-config` 动态挂载正确的编辑组件 (例如 `<input>`, `textarea`)。
         *   `blur` (失焦) 或按下 `Enter` 键时，触发一个 `update` 事件，该事件包含一个针对其路径和新值的 [JSON Patch](https://tools.ietf.org/html/rfc6902) `replace` 操作。
+        *   在只读模式下，禁用所有编辑交互和视觉提示。
 
 ### 3.2. 状态管理 (Pinia)
 
@@ -362,4 +364,38 @@ const documentSchema = z.object({
 });
 ```
 
-通过这种方式，我们实现了关注点分离：`presentation-schema` 关心**表现和值的格式**，而 `documentSchema` 关心**最终的结构完整性**。 
+通过这种方式，我们实现了关注点分离：`presentation-schema` 关心**表现和值的格式**，而 `documentSchema` 关心**最终的结构完整性**。
+
+## 7. 只读模式功能
+
+为了支持纯展示场景，系统提供了只读模式功能。
+
+### 7.1. 功能特性
+
+当 `JsonDocument` 组件的 `readonly` 属性设置为 `true` 时：
+
+*   **禁用内联编辑**: `EditableField` 组件不会显示 hover 效果，点击也不会进入编辑状态
+*   **隐藏数组控件**: `ArrayControl` 组件完全不显示，包括添加和删除按钮
+*   **禁用交互反馈**: 所有编辑相关的视觉反馈和鼠标事件处理都被禁用
+*   **保持渲染能力**: 文档内容正常渲染，只是去除了编辑功能
+
+### 7.2. 使用方式
+
+```vue
+<template>
+  <JsonDocument
+    :json-data="documentData"
+    :presentation-schema="schema"
+    :readonly="true"
+  />
+</template>
+```
+
+### 7.3. 实现机制
+
+*   `JsonDocument.vue` 通过 Vue 3 的 `provide/inject` 机制将 `readonly` 状态传递给所有子组件
+*   `EditableField.vue` 根据 `readonly` 状态决定是否启用交互功能
+*   `ArrayControl.vue` 在只读模式下完全不渲染
+*   `NodeRenderer.vue` 在只读模式下不触发 hover 事件和显示数组控件
+
+这种设计确保了在只读模式下文档可以正常显示和阅读，同时完全避免了意外的编辑操作。 

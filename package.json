@@ -14,11 +14,16 @@
       "import": "./dist/json-document.es.js",
       "require": "./dist/json-document.cjs.js"
     },
-    "./dist/style.css": "./dist/vue-json-document.css"
+    "./dist/style.css": "./dist/vue-json-document.css",
+    "./docs/usage": "./docs/LIB_USAGE.md",
+    "./docs/development": "./docs/LOCAL_DEVELOPMENT.md"
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "docs/LIB_USAGE.md",
+    "docs/LOCAL_DEVELOPMENT.md",
+    "README.md"
   ],
   "keywords": [
     "vue",

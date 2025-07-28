@@ -264,6 +264,31 @@ function handleDocumentUpdate(patch) {
 - Safari 12+
 - Edge 79+
 
+## 获取帮助
+
+### 程序化访问文档
+
+```javascript
+import { docs } from 'vue-json-document'
+
+// 显示帮助信息
+docs.showHelp()
+
+// 获取快速开始示例
+const example = docs.getQuickStartExample()
+console.log(example.template)
+console.log(example.script)
+
+// 在Node.js环境中查看完整文档
+await docs.openUsageDocs()
+```
+
+### 文档文件位置
+
+安装后，文档文件位于：
+- `node_modules/vue-json-document/docs/LIB_USAGE.md`
+- `node_modules/vue-json-document/docs/LOCAL_DEVELOPMENT.md`
+
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！

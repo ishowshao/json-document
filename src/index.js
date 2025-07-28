@@ -11,6 +11,7 @@ import { useDocumentStore } from './stores/document'
 
 // Utilities
 import * as schemaUtils from './utils/schema'
+import * as docs from './docs'
 
 // Export individual components
 export {
@@ -19,7 +20,8 @@ export {
   EditableField,
   ArrayControl,
   useDocumentStore,
-  schemaUtils
+  schemaUtils,
+  docs
 }
 
 // Export as a plugin for Vue.use()

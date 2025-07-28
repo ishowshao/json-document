@@ -87,6 +87,20 @@ export declare function useDocumentStore(): DocumentStore
 // Utility Exports
 export declare const schemaUtils: SchemaUtils
 
+// Documentation Utilities
+export declare const docs: {
+  getUsageDocsPath(): string
+  getDevDocsPath(): string
+  openUsageDocs(): Promise<void>
+  getQuickStartExample(): {
+    template: string
+    script: string
+    install: string
+    description: string
+  }
+  showHelp(): void
+}
+
 // Plugin Type
 export interface JsonDocumentSystemPlugin {
   install(app: App): void

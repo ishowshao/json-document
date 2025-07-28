@@ -54,7 +54,20 @@ const schema = {
 
 ## 📖 文档
 
-详细使用文档请查看 [LIB_USAGE.md](./LIB_USAGE.md)
+- **使用指南**: [docs/LIB_USAGE.md](./docs/LIB_USAGE.md)
+- **本地开发**: [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md)
+- **包内文档**: [docs/PACKAGE_DOCS.md](./docs/PACKAGE_DOCS.md)
+
+### 💡 安装后访问文档
+
+```javascript
+// 程序化访问文档
+import { docs } from 'vue-json-document'
+
+docs.showHelp()                    // 显示帮助信息
+docs.getQuickStartExample()        // 获取快速开始示例
+await docs.openUsageDocs()         // 查看完整使用文档
+```
 
 ## 🏗️ 核心架构
 

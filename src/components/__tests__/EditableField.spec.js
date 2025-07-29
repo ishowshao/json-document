@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 import EditableField from '../EditableField.vue'
 
 describe('EditableField', () => {
@@ -146,6 +146,147 @@ describe('EditableField', () => {
       })
 
       expect(wrapper.text()).toContain('Readonly Value')
+    })
+  })
+
+  describe('highlight functionality', () => {
+    it('applies highlight class when path is in highlightedPaths', () => {
+      const highlightedPaths = ref(new Set(['/test']))
+      
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            highlightedPaths,
+            readonly: ref(false),
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).toContain('json-document-highlight')
+    })
+
+    it('does not apply highlight class when path is not in highlightedPaths', () => {
+      const highlightedPaths = ref(new Set(['/other']))
+      
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            highlightedPaths,
+            readonly: ref(false),
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).not.toContain('json-document-highlight')
+    })
+
+    it('reacts to changes in highlightedPaths', async () => {
+      const highlightedPaths = ref(new Set())
+      
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            highlightedPaths,
+            readonly: ref(false),
+          },
+        },
+      })
+
+      let span = wrapper.find('span')
+      expect(span.classes()).not.toContain('json-document-highlight')
+
+      // Add path to highlighted paths
+      highlightedPaths.value.add('/test')
+      await nextTick()
+
+      span = wrapper.find('span')
+      expect(span.classes()).toContain('json-document-highlight')
+
+      // Remove path from highlighted paths
+      highlightedPaths.value.delete('/test')
+      await nextTick()
+
+      span = wrapper.find('span')
+      expect(span.classes()).not.toContain('json-document-highlight')
+    })
+
+    it('works with empty highlightedPaths', () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            highlightedPaths: ref(new Set()),
+            readonly: ref(false),
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).not.toContain('json-document-highlight')
+    })
+
+    it('uses default empty Set when highlightedPaths is not provided', () => {
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            readonly: ref(false),
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).not.toContain('json-document-highlight')
+      // Should not throw error when highlightedPaths is not provided
+      expect(wrapper.vm.isHighlighted).toBe(false)
+    })
+
+    it('combines highlight with other classes correctly', () => {
+      const highlightedPaths = ref(new Set(['/test']))
+      
+      const wrapper = mount(EditableField, {
+        props: {
+          path: '/test',
+          value: 'Test Value',
+          editorConfig: 'input',
+        },
+        global: {
+          provide: {
+            highlightedPaths,
+            readonly: ref(false),
+          },
+        },
+      })
+
+      const span = wrapper.find('span')
+      expect(span.classes()).toContain('json-document-highlight')
+      expect(span.classes()).toContain('cursor-pointer')
+      expect(span.classes()).toContain('transition-all')
     })
   })
 })

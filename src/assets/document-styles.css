@@ -75,3 +75,23 @@
 .json-document address {
   font-style: normal;
 }
+
+/* Preview mode highlight styles */
+.json-document-highlight {
+  background-color: #fef3c7 !important;
+  border: 2px solid #f59e0b !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3) !important;
+  padding: 2px 4px !important;
+  margin: -2px -4px !important;
+  animation: json-document-pulse 2s ease-in-out infinite;
+}
+
+@keyframes json-document-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  }
+}

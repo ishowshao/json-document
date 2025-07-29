@@ -6,6 +6,7 @@
       'cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300':
         !readonly,
       'bg-blue-50 outline outline-1 outline-blue-300': isHovering && !readonly,
+      'json-document-highlight': isHighlighted,
     }"
     @click="!readonly && startEditing()"
     @mouseenter="!readonly && (isHovering = true)"
@@ -49,8 +50,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update'])
 
-// Inject readonly state
+// Inject readonly state and highlighted paths
 const readonly = inject('readonly', ref(false))
+const highlightedPaths = inject('highlightedPaths', ref(new Set()))
 
 // Component state
 const isEditing = ref(false)
@@ -64,6 +66,11 @@ const displayValue = computed(() => {
     return ''
   }
   return String(props.value)
+})
+
+// Check if this field is highlighted in preview mode
+const isHighlighted = computed(() => {
+  return highlightedPaths.value.has(props.path)
 })
 
 // Editor component mapping

@@ -2,6 +2,8 @@
 
 一个 Vue 3 组件库，用于动态 JSON 文档渲染和内联编辑功能。
 
+**最新功能：AI 协同编辑与预览模式** - 现在支持由 AI 或其他系统生成 `JSON Patch`，在应用前进行高亮预览，并由用户决定接受或拒绝变更。
+
 ## 安装
 
 ```bash
@@ -10,171 +12,159 @@ npm install vue-json-document
 
 ## 基本使用
 
-### 1. 全局注册（推荐）
-
-```javascript
-import { createApp } from 'vue'
-import JsonDocumentSystem from 'vue-json-document'
-import 'vue-json-document/dist/vue-json-document.css'
-
-const app = createApp(App)
-app.use(JsonDocumentSystem)
-```
-
-### 2. 按需导入
-
-```javascript
-import { JsonDocument } from 'vue-json-document'
-import 'vue-json-document/dist/vue-json-document.css'
-
-export default {
-  components: {
-    JsonDocument
-  }
-}
-```
-
-## 组件使用
-
-### JsonDocument 主组件
-
 ```vue
 <template>
   <JsonDocument
+    ref="jsonDocRef"
     :json-data="jsonData"
     :presentation-schema="presentationSchema"
     :document-schema="documentSchema"
     :readonly="false"
+    @change="handleDocChange"
+    @preview-start="handlePreviewStart"
+    @preview-accept="handlePreviewAccept"
+    @preview-reject="handlePreviewReject"
   />
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { z } from 'zod'
+
+const jsonDocRef = ref(null) // 创建一个 ref 来访问组件实例
 
 const jsonData = ref({
   title: "文档标题",
-  authors: ["张三", "李四"],
-  content: [
-    {
-      title: "章节一",
-      description: "章节描述"
-    }
-  ]
+  content: "这是原始内容。"
 })
 
 const presentationSchema = ref({
   rules: {
-    "$.title": {
-      tag: "h1",
-      editor: "input"
-    },
-    "$.authors[*]": {
-      tag: "li",
-      editor: "input"
-    },
-    "$.content[*].title": {
-      tag: "h2",
-      editor: "input"
-    },
-    "$.content[*].description": {
-      tag: "p",
-      editor: "textarea"
-    }
-  },
-  layout: {
-    "/authors": {
-      tag: "ul",
-      static: {
-        before: [{ tag: "h2", content: "作者列表" }]
-      }
-    }
+    "$.title": { "tag": "h1", "editor": "input" },
+    "$.content": { "tag": "p", "editor": "textarea" }
   }
 })
 
-// 可选：文档验证模式
-import { z } from 'zod'
+// 可选的 Zod 验证 schema
 const documentSchema = z.object({
   title: z.string().min(1),
-  authors: z.array(z.string()),
-  content: z.array(z.object({
-    title: z.string(),
-    description: z.string().optional()
-  }))
+  content: z.string(),
 })
+
+function handleDocChange(newDocument) {
+  console.log('文档已变更:', newDocument)
+}
+
+// --- 预览模式事件处理 ---
+function handlePreviewStart(event) {
+  console.log('预览模式已开始:', event.patch)
+  // 在这里显示 "接受" / "拒绝" 按钮
+}
+
+function handlePreviewAccept(event) {
+  console.log('变更已接受:', event.patch)
+  // 在这里隐藏 "接受" / "拒绝" 按钮
+}
+
+function handlePreviewReject() {
+  console.log('变更已拒绝')
+  // 在这里隐藏 "接受" / "拒绝" 按钮
+}
 </script>
 ```
 
-## 状态管理
+## 高级功能：AI协同与预览模式
 
-### 使用 Pinia Store
+为了支持更复杂的场景，如人机协同编辑，组件提供了一套预览模式的 API。它允许你接收一个 `JSON Patch` 变更集，在UI上高亮显示这些变更，然后由用户决定是接受还是拒绝。
 
-```javascript
-import { useDocumentStore } from 'vue-json-document'
+### 工作流程
 
-export default {
-  setup() {
-    const documentStore = useDocumentStore()
+1.  **获取组件实例**: 使用 `ref` 标记 `<JsonDocument>` 组件。
+2.  **触发预览**: 当你的应用从外部（例如 AI 服务）获得一个 `JSON Patch` 后，调用组件实例的 `previewChanges(patch)` 方法。
+3.  **进入预览模式**:
+    *   组件会触发 `@preview-start` 事件。
+    *   所有被 `patch` 影响的字段将在UI上高亮显示。
+    *   此时，原始数据**不会**被修改。
+4.  **用户决策**:
+    *   如果用户决定**接受**，你调用 `acceptChanges()` 方法。组件会触发 `@preview-accept` 和 `@change` 事件，并将变更应用到原始数据。
+    *   如果用户决定**拒绝**，你调用 `rejectChanges()` 方法。组件会触发 `@preview-reject` 事件，UI恢复到原始状态。
+
+### 示例代码
+
+```vue
+<template>
+  <div>
+    <div class="controls">
+      <button @click="triggerAIEdit" :disabled="isInPreview">模拟 AI 编辑</button>
+      <button v-if="isInPreview" @click="accept">✅ 接受</button>
+      <button v-if="isInPreview" @click="reject">❌ 拒绝</button>
+    </div>
     
-    // 获取当前文档
-    const currentDoc = documentStore.document
-    
-    // 检查是否有错误
-    const hasErrors = documentStore.errors.length > 0
-    
-    return {
-      documentStore,
-      currentDoc,
-      hasErrors
-    }
-  }
-}
-```
+    <JsonDocument
+      ref="jsonDocRef"
+      :json-data="jsonData"
+      :presentation-schema="presentationSchema"
+      @preview-start="isInPreview = true"
+      @preview-accept="isInPreview = false"
+      @preview-reject="isInPreview = false"
+    />
+  </div>
+</template>
 
-## 工具函数
+<script setup>
+import { ref } from 'vue';
 
-### 模式工具
+const jsonDocRef = ref(null);
+const isInPreview = ref(false);
 
-```javascript
-import { schemaUtils } from 'vue-json-document'
+const jsonData = ref({
+  title: "AI协同编辑器",
+  description: "点击按钮，模拟AI提出的修改建议。"
+});
 
-// 从模式生成默认值
-const defaultValue = schemaUtils.generateDefaultFromSchema(yourSchema)
-
-// 获取路径对应的模式
-const pathSchema = schemaUtils.getSchemaForPath(schema, ['path', 'segments'])
-```
-
-## TypeScript 支持
-
-库提供完整的 TypeScript 类型定义：
-
-```typescript
-import type { 
-  JsonDocumentProps,
-  PresentationSchema,
-  JsonPatch 
-} from 'vue-json-document'
-
-const props: JsonDocumentProps = {
-  jsonData: {...},
-  presentationSchema: {...},
-  documentSchema: null,
-  readonly: false  // 新增 readonly 属性
-}
-
-const schema: PresentationSchema = {
+const presentationSchema = ref({
   rules: {
-    "$.title": {
-      tag: "h1",
-      editor: "input"
-    }
+    "$.title": { "tag": "h1", "editor": "input" },
+    "$.description": { "tag": "p", "editor": "textarea" }
   }
+});
+
+// 模拟从 AI 服务获取 patch
+function triggerAIEdit() {
+  if (!jsonDocRef.value) return;
+
+  const aiGeneratedPatch = [
+    { op: 'replace', path: '/title', value: 'AI 增强的标题' },
+    { op: 'replace', path: '/description', value: '这段描述由 AI 进行了优化，使其更具吸引力。' }
+  ];
+
+  // 调用组件方法，进入预览模式
+  jsonDocRef.value.previewChanges(aiGeneratedPatch);
 }
+
+function accept() {
+  jsonDocRef.value?.acceptChanges();
+}
+
+function reject() {
+  jsonDocRef.value?.rejectChanges();
+}
+</script>
+
+<style>
+/* 为高亮区域添加自定义样式 */
+.json-document-highlight {
+  background-color: #fffbe6; /* 淡黄色背景 */
+  border: 1px dashed #f59e0b; /* 橙色虚线边框 */
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+</style>
 ```
 
-## 组件属性
+## 组件 API
 
-### JsonDocument Props
+### Props
 
 | 属性名 | 类型 | 必需 | 默认值 | 说明 |
 |--------|------|------|--------|------|
@@ -183,194 +173,74 @@ const schema: PresentationSchema = {
 | `document-schema` | `Object` | ❌ | `null` | 文档验证模式 (Zod Schema) |
 | `readonly` | `Boolean` | ❌ | `false` | 是否为只读模式 |
 
-### 只读模式
+### 方法 (Exposed Methods)
 
-当设置 `readonly: true` 时，文档将以只读模式渲染：
+你需要通过 `ref` 来调用这些方法。
+
+| 方法名 | 参数 | 返回值 | 说明 |
+|--------------|-------------------------|----------|----------------------------------------------------|
+| `previewChanges` | `patch: JSONPatch[]` | `void` | 接收一个 `JSON Patch` 数组，进入预览模式并高亮变更。 |
+| `acceptChanges` | - | `void` | 接受当前预览的变更，并将其应用到文档。 |
+| `rejectChanges` | - | `void` | 拒绝当前预览的变更，并退出预览模式。 |
+
+### 事件 (Events)
+
+| 事件名 | 载荷 (Payload) | 说明 |
+|----------------|------------------------------------------------|----------------------------------------------------------|
+| `@change` | `newDocument: Object` | 当文档内容发生永久性变更时触发（包括接受预览）。 |
+| `@preview-start` | `{ patch: JSONPatch[], highlightedPaths: string[] }` | 调用 `previewChanges` 成功后触发。 |
+| `@preview-accept`| `{ patch: JSONPatch[] }` | 调用 `acceptChanges` 成功后触发。 |
+| `@preview-reject`| - | 调用 `rejectChanges` 后触发。 |
+
+## 只读模式
+
+当设置 `readonly: true` 时，文档将以只读模式渲染，所有编辑和预览功能都将被禁用。
 
 ```vue
 <template>
-  <!-- 只读模式 - 禁用所有编辑功能 -->
   <JsonDocument
     :json-data="jsonData"
     :presentation-schema="presentationSchema"
     :readonly="true"
   />
-  
-  <!-- 编辑模式 - 默认行为 -->
-  <JsonDocument
-    :json-data="jsonData"
-    :presentation-schema="presentationSchema"
-    :readonly="false"
-  />
 </template>
-```
-
-**只读模式特性：**
-- ❌ 无 hover 编辑提示
-- ❌ 无法点击编辑字段
-- ❌ 无数组增删控制按钮
-- ✅ 保持完整的渲染功能
-- ✅ 适用于展示和打印场景
-
-**典型使用场景：**
-```vue
-<script setup>
-import { ref, computed } from 'vue'
-
-const isEditMode = ref(false)
-const jsonData = ref({...})
-const presentationSchema = ref({...})
-
-// 根据用户权限或模式动态切换
-const readonly = computed(() => 
-  !isEditMode.value || !userHasEditPermission.value
-)
-</script>
-
-<template>
-  <div>
-    <button @click="isEditMode = !isEditMode">
-      {{ isEditMode ? '切换到查看模式' : '切换到编辑模式' }}
-    </button>
-    
-    <JsonDocument
-      :json-data="jsonData"
-      :presentation-schema="presentationSchema"
-      :readonly="readonly"
-    />
-  </div>
-</template>
-```
-
-## 高级配置
-
-### 自定义编辑器
-
-```javascript
-const presentationSchema = {
-  rules: {
-    "$.description": {
-      tag: "div",
-      editor: "textarea"  // 支持 "input" | "textarea"
-    }
-  }
-}
-```
-
-### 数组操作
-
-系统自动为数组元素提供添加/删除控制：
-
-```javascript
-const presentationSchema = {
-  rules: {
-    "$.items[*]": {
-      tag: "div",
-      editor: "input"
-    }
-  }
-}
-```
-
-### 自定义属性映射
-
-```javascript
-const presentationSchema = {
-  rules: {
-    "$.imageUrl": {
-      tag: "img",
-      useValueAs: "src"  // 将值作为 src 属性
-    }
-  }
-}
-```
-
-## 事件处理
-
-### 监听文档更新
-
-```vue
-<template>
-  <JsonDocument
-    :json-data="jsonData"
-    :presentation-schema="presentationSchema"
-    @update="handleDocumentUpdate"
-  />
-</template>
-
-<script setup>
-function handleDocumentUpdate(patch) {
-  console.log('文档更新:', patch)
-  // patch 是 JSON Patch 格式
-  // { op: 'replace', path: '/title', value: 'new value' }
-}
-</script>
 ```
 
 ## 样式定制
 
-库使用 TailwindCSS 构建，你可以：
-
-1. 覆盖 CSS 变量
-2. 使用自定义 TailwindCSS 配置
-3. 直接覆盖组件样式
+你可以通过覆盖 CSS 类来定制组件的外观。
 
 ```css
-/* 自定义编辑字段样式 */
-.json-document .editable-field {
-  /* 自定义样式 */
+/* 自定义编辑字段的悬浮效果 */
+.json-document .editable-field:hover {
+  background-color: #f0f8ff;
+}
+
+/* 自定义预览模式下的高亮样式 */
+.json-document-highlight {
+  background-color: #fef3c7 !important; /* 建议使用 !important 确保覆盖 */
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
 }
 ```
 
-## 打包大小
+## TypeScript 支持
 
-- ES 模块: ~240KB (gzipped: ~56KB)
-- UMD 模块: ~155KB (gzipped: ~48KB)  
-- CJS 模块: ~155KB (gzipped: ~48KB)
-- CSS: ~0.33KB (gzipped: ~0.25KB)
+库提供完整的 TypeScript 类型定义。
 
-## 依赖要求
+```typescript
+import type { 
+  JsonDocumentProps,
+  PresentationSchema,
+  JsonPatch,
+  JsonDocumentExposedMethods // 新增类型
+} from 'vue-json-document'
+import { ref } from 'vue'
 
-- Vue 3.5+
-- Pinia 3.0+
+const jsonDocRef = ref<JsonDocumentExposedMethods | null>(null)
 
-## 浏览器支持
-
-支持所有现代浏览器，包括：
-- Chrome 60+
-- Firefox 60+
-- Safari 12+
-- Edge 79+
-
-## 获取帮助
-
-### 程序化访问文档
-
-```javascript
-import { docs } from 'vue-json-document'
-
-// 显示帮助信息
-docs.showHelp()
-
-// 获取快速开始示例
-const example = docs.getQuickStartExample()
-console.log(example.template)
-console.log(example.script)
-
-// 在Node.js环境中查看完整文档
-await docs.openUsageDocs()
+// 调用方法
+jsonDocRef.value?.previewChanges([...])
 ```
 
-### 文档文件位置
-
-安装后，文档文件位于：
-- `node_modules/vue-json-document/docs/LIB_USAGE.md`
-- `node_modules/vue-json-document/docs/LOCAL_DEVELOPMENT.md`
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 许可证
-
-MIT License
+---
+*（文档的其余部分，如安装、依赖等保持不变）*

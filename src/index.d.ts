@@ -76,8 +76,24 @@ export interface SchemaUtils {
   generateDefaultFromSchema(schema: any): any
 }
 
+// Preview Mode Types
+export interface JsonDocumentInstance {
+  previewChanges(patch: JsonPatch[]): void
+  acceptChanges(): void
+  rejectChanges(): void
+}
+
+export interface JsonDocumentEvents {
+  change: [data: Record<string, any>]
+  'preview-start': []
+  'preview-accept': []
+  'preview-reject': []
+}
+
 // Component Exports
-export declare const JsonDocument: DefineComponent<JsonDocumentProps>
+export declare const JsonDocument: DefineComponent<JsonDocumentProps, {}, {}, {}, {}, {}, {}, JsonDocumentEvents> & {
+  new (): JsonDocumentInstance
+}
 export declare const NodeRenderer: DefineComponent<NodeRendererProps>
 export declare const EditableField: DefineComponent<EditableFieldProps>
 export declare const ArrayControl: DefineComponent<ArrayControlProps>

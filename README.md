@@ -58,7 +58,7 @@ const schema = {
 - **本地开发**: [docs/LOCAL_DEVELOPMENT.md](./docs/LOCAL_DEVELOPMENT.md)
 - **包内文档**: [docs/PACKAGE_DOCS.md](./docs/PACKAGE_DOCS.md)
 
-### 💡 安装后访问文档
+### 💡 快速访问帮助
 
 ```javascript
 // 程序化访问文档
@@ -66,7 +66,6 @@ import { docs } from 'vue-json-document'
 
 docs.showHelp()                    // 显示帮助信息
 docs.getQuickStartExample()        // 获取快速开始示例
-await docs.openUsageDocs()         // 查看完整使用文档
 ```
 
 ## 🏗️ 核心架构

@@ -35,12 +35,7 @@ const example = docs.getQuickStartExample()
 console.log(example.template)
 console.log(example.script)
 
-// 在Node.js环境中显示文档内容
-await docs.openUsageDocs()
-
-// 获取文档路径（用于构建工具或脚本）
-const usagePath = docs.getUsageDocsPath()    // 'vue-json-document/docs/usage'
-const devPath = docs.getDevDocsPath()        // 'vue-json-document/docs/development'
+// 更多帮助信息请查看 README.md 或直接访问文档文件
 ```
 
 ### 3. ES模块直接导入
@@ -120,10 +115,11 @@ docs.showHelp()
 // 在VSCode扩展或其他开发工具中
 import { docs } from 'vue-json-document'
 import { readFileSync } from 'fs'
+import { resolve } from 'path'
 
-// 读取文档内容用于智能提示或帮助面板
-const usagePath = docs.getUsageDocsPath()
-const docContent = readFileSync(`node_modules/${usagePath}`, 'utf-8')
+// 直接读取文档文件
+const docPath = resolve('node_modules/vue-json-document/docs/LIB_USAGE.md')
+const docContent = readFileSync(docPath, 'utf-8')
 
 // 解析并在开发工具中显示
 displayHelp(docContent)

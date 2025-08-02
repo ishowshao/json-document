@@ -106,9 +106,6 @@ export declare const schemaUtils: SchemaUtils
 
 // Documentation Utilities
 export declare const docs: {
-  getUsageDocsPath(): string
-  getDevDocsPath(): string
-  openUsageDocs(): Promise<void>
   getQuickStartExample(): {
     template: string
     script: string

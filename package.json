@@ -2,7 +2,7 @@
   "name": "vue-json-document",
   "version": "1.0.0",
   "description": "A Vue 3 component library for dynamic JSON document rendering with inline editing capabilities",
-  "author": "Your Name",
+  "author": "ishowshao",
   "license": "MIT",
   "type": "module",
   "main": "./dist/json-document.cjs.js",

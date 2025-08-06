@@ -1,6 +1,6 @@
 {
   "name": "vue-json-document",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Vue 3 component library for dynamic JSON document rendering with inline editing capabilities",
   "author": "ishowshao",
   "license": "MIT",

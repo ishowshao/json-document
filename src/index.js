@@ -2,7 +2,7 @@
 // A Vue 3 component library for dynamic JSON document rendering with inline editing
 
 // Import styles
-import './assets/document-styles.css'
+import './assets/main.css'
 
 import JsonDocument from './components/JsonDocument.vue'
 import NodeRenderer from './components/NodeRenderer.vue'

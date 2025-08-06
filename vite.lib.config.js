@@ -4,6 +4,8 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { copyFileSync } from 'fs'
 
+import tailwindcss from '@tailwindcss/vite'
+
 // Custom plugin to copy type definitions
 const copyTypesPlugin = () => ({
   name: 'copy-types',
@@ -17,7 +19,7 @@ const copyTypesPlugin = () => ({
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), copyTypesPlugin()],
+  plugins: [vue(), tailwindcss(), copyTypesPlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

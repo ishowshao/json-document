@@ -10,6 +10,15 @@
 npm install vue-json-document
 ```
 
+## 引入样式
+
+为了确保组件样式正确加载，你需要在你的主入口文件中引入预编译的 CSS：
+
+```javascript
+// main.js 或类似文件
+import 'vue-json-document/dist/style.css'
+```
+
 ## 基本使用
 
 ```vue

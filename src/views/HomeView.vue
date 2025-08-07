@@ -85,7 +85,10 @@
         >
           <div class="flex justify-between items-center mb-2">
             <h3 class="m-0 text-slate-700 text-lg">Rendered Output</h3>
-            <div v-if="isInPreviewMode" class="text-sm font-medium px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full border border-yellow-300">
+            <div
+              v-if="isInPreviewMode"
+              class="text-sm font-medium px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full border border-yellow-300"
+            >
               🔍 Preview Mode - Changes highlighted below
             </div>
           </div>
@@ -133,11 +136,51 @@ const jsonInput = ref(`{
   "paragraphs": [
     {
       "title": "概述",
-      "description": "灵活的文档系统"
+      "description": "灵活的文档系统",
+      "content": {
+        "summary": "这是一个基于Vue 3的JSON文档系统",
+        "features": [
+          "动态内容呈现分离",
+          "内联编辑功能",
+          "JSON Patch状态管理"
+        ],
+        "metadata": {
+          "version": "1.0.0",
+          "lastModified": "2024-01-15"
+        }
+      }
     },
     {
       "title": "快速上手",
-      "description": "灵活的文档系统"
+      "description": "简单几步即可开始使用",
+      "content": {
+        "summary": "按照以下步骤快速开始",
+        "features": [
+          "安装依赖包",
+          "启动开发服务器",
+          "编辑JSON数据"
+        ],
+        "metadata": {
+          "version": "1.0.0",
+          "lastModified": "2024-01-16"
+        }
+      }
+    },
+    {
+      "title": "最后一段",
+      "description": "最后一段",
+      "content": {
+        "summary": "最后一段",
+        "features": [
+          "安装依赖包",
+          "启动开发服务器",
+          "编辑JSON数据"
+        ],
+        "metadata": {
+          "version": "1.0.0",
+          "lastModified": "2024-01-16"
+        }
+      }
     }
   ]
 }`)
@@ -162,6 +205,33 @@ const schemaInput = ref(`{
     "$.paragraphs[*].description": {
       "tag": "p",
       "editor": "textarea"
+    },
+    "$.paragraphs[*].content": {
+      "tag": "div",
+      "class": "content-wrapper"
+    },
+    "$.paragraphs[*].content.summary": {
+      "tag": "p",
+      "class": "summary",
+      "editor": "textarea"
+    },
+    "$.paragraphs[*].content.features[*]": {
+      "tag": "li",
+      "editor": "input"
+    },
+    "$.paragraphs[*].content.metadata": {
+      "tag": "div",
+      "class": "metadata"
+    },
+    "$.paragraphs[*].content.metadata.version": {
+      "tag": "span",
+      "class": "version",
+      "editor": "input"
+    },
+    "$.paragraphs[*].content.metadata.lastModified": {
+      "tag": "span",
+      "class": "last-modified",
+      "editor": "input"
     }
   },
   "layout": {
@@ -169,6 +239,19 @@ const schemaInput = ref(`{
       "tag": "ul",
       "static": {
         "before": [{ "tag": "h2", "content": "作者" }]
+      }
+    },
+    "/paragraphs/*/content/features": {
+      "tag": "ul",
+      "static": {
+        "before": [{ "tag": "h3", "content": "特性" }]
+      }
+    },
+    "/paragraphs/*/content/metadata": {
+      "tag": "div",
+      "static": {
+        "before": [{ "tag": "h4", "content": "元数据" }],
+        "after": [{ "tag": "small", "content": "版本: " }]
       }
     }
   }
@@ -188,6 +271,14 @@ const documentSchema = markRaw(
         z.object({
           title: z.string(),
           description: z.string().optional(),
+          content: z.object({
+            summary: z.string(),
+            features: z.array(z.string()),
+            metadata: z.object({
+              version: z.string(),
+              lastModified: z.string(),
+            }),
+          }),
         }),
       )
       .min(1),
@@ -229,35 +320,35 @@ function toggleReadonlyMode() {
 // Preview mode functions
 function testPreviewMode() {
   if (!jsonDocumentRef.value) return
-  
+
   // Create a sample AI-generated patch for testing
   const samplePatch = [
     {
       op: 'replace',
       path: '/title',
-      value: 'AI Enhanced Document System'
+      value: 'AI Enhanced Document System',
     },
     {
       op: 'add',
       path: '/authors/-',
-      value: '李四 (Developer)'
+      value: '李四 (Developer)',
     },
     {
       op: 'add',
       path: '/authors/-',
-      value: '王五 (Designer)'
+      value: '王五 (Designer)',
     },
     {
       op: 'remove',
-      path: '/paragraphs/1'
+      path: '/paragraphs/1',
     },
     {
       op: 'replace',
       path: '/paragraphs/0/description',
-      value: '一个由AI增强的灵活文档系统，支持智能编辑和预览功能'
-    }
+      value: '一个由AI增强的灵活文档系统，支持智能编辑和预览功能',
+    },
   ]
-  
+
   console.log('Starting preview with sample patch:', samplePatch)
   jsonDocumentRef.value.previewChanges(samplePatch)
 }
@@ -268,7 +359,7 @@ function acceptPreview() {
 }
 
 function rejectPreview() {
-  if (!jsonDocumentRef.value) return  
+  if (!jsonDocumentRef.value) return
   jsonDocumentRef.value.rejectChanges()
 }
 

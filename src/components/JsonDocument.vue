@@ -116,6 +116,31 @@ function initializeDocument() {
   }
 }
 
+// Helper function to get value at JSON Pointer path
+function getValueAtPath(data, path) {
+  if (!path || path === '/') return data
+  
+  const segments = path.split('/').slice(1) // Remove empty first element
+  let current = data
+  
+  for (const segment of segments) {
+    if (current === null || current === undefined) return undefined
+    
+    // Handle array indices
+    if (Array.isArray(current)) {
+      const index = parseInt(segment, 10)
+      if (isNaN(index) || index < 0 || index >= current.length) return undefined
+      current = current[index]
+    } else if (typeof current === 'object') {
+      current = current[segment]
+    } else {
+      return undefined
+    }
+  }
+  
+  return current
+}
+
 function handleUpdate(patch) {
   // In preview mode, ignore regular updates
   if (isPreviewing.value) {
@@ -177,11 +202,29 @@ function previewChanges(patch) {
     // Store the patch
     previewPatch.value = patch
     
-    // Extract paths for highlighting
+    // Extract paths for highlighting and resolve array append paths
     const paths = new Set()
+    const testDataForPaths = deepClone(originalData.value)
+    
     patchArray.forEach(p => {
       if (p.path) {
-        paths.add(p.path)
+        if (p.op === 'add' && p.path.endsWith('/-')) {
+          // For array append operations, calculate the actual index
+          const basePath = p.path.slice(0, -2) // Remove '/-'
+          const arrayData = getValueAtPath(testDataForPaths, basePath)
+          if (Array.isArray(arrayData)) {
+            const actualPath = `${basePath}/${arrayData.length}`
+            paths.add(actualPath)
+            // Apply this operation to testData to get correct indices for subsequent operations
+            try {
+              applyPatch(testDataForPaths, [{ op: 'add', path: actualPath, value: p.value }])
+            } catch (e) {
+              console.warn('Failed to apply path calculation patch:', e)
+            }
+          }
+        } else {
+          paths.add(p.path)
+        }
       }
     })
     highlightedPaths.value = paths

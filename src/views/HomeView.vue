@@ -238,6 +238,20 @@ function testPreviewMode() {
       value: 'AI Enhanced Document System'
     },
     {
+      op: 'add',
+      path: '/authors/-',
+      value: '李四 (Developer)'
+    },
+    {
+      op: 'add',
+      path: '/authors/-',
+      value: '王五 (Designer)'
+    },
+    {
+      op: 'remove',
+      path: '/paragraphs/1'
+    },
+    {
       op: 'replace',
       path: '/paragraphs/0/description',
       value: '一个由AI增强的灵活文档系统，支持智能编辑和预览功能'

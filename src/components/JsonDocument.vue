@@ -222,6 +222,10 @@ function previewChanges(patch) {
               console.warn('Failed to apply path calculation patch:', e)
             }
           }
+        } else if (p.op === 'remove') {
+          // For remove operations, don't add the path directly as it would highlight the wrong element
+          // Instead, we'll handle this in the preview data and let the removal be visible through absence
+          // Don't add to paths for highlighting
         } else {
           paths.add(p.path)
         }

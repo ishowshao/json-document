@@ -168,9 +168,9 @@ const jsonInput = ref(`{
     },
     {
       "title": "最后一段",
-      "description": "最后一段",
+      "description": "最后一段description",
       "content": {
-        "summary": "最后一段",
+        "summary": "最后一段summary",
         "features": [
           "安装依赖包",
           "启动开发服务器",
@@ -346,6 +346,15 @@ function testPreviewMode() {
       op: 'replace',
       path: '/paragraphs/0/description',
       value: '一个由AI增强的灵活文档系统，支持智能编辑和预览功能',
+    },
+    {
+      op: 'add',
+      path: '/paragraphs/0/content/features/-',
+      value: 'AI智能预览功能',
+    },
+    {
+      op: 'remove',
+      path: '/paragraphs/1/content/features/0',
     },
   ]
 

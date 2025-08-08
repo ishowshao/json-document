@@ -3,8 +3,9 @@
 一个 Vue 3 组件库，用于动态 JSON 文档渲染和内联编辑功能。该库实现了数据与表现分离的架构，通过 JSON Patch (RFC 6902) 进行原子化状态管理，支持实时协同编辑和预览模式。
 
 **核心特性：**
+
 - 🎯 **动态内容渲染** - 通过 JSONPath 规则映射 JSON 数据到 HTML 元素
-- ✏️ **内联编辑** - 悬停激活、点击编辑的交互体验  
+- ✏️ **内联编辑** - 悬停激活、点击编辑的交互体验
 - 🔄 **JSON Patch 操作** - 符合 RFC 6902 标准的原子化更新
 - 🤖 **AI 协同编辑** - 支持预览模式，在应用变更前进行高亮显示
 - 🛡️ **Zod 验证** - 集成 Zod 进行数据结构验证
@@ -75,31 +76,31 @@ import { z } from 'zod'
 const jsonDocRef = ref(null) // 创建一个 ref 来访问组件实例
 
 const jsonData = ref({
-  title: "文档标题",
-  content: "这是原始内容。",
+  title: '文档标题',
+  content: '这是原始内容。',
   author: {
-    name: "作者姓名",
-    email: "author@example.com"
+    name: '作者姓名',
+    email: 'author@example.com',
   },
-  tags: ["标签1", "标签2"]
+  tags: ['标签1', '标签2'],
 })
 
 const presentationSchema = ref({
   rules: {
-    "$.title": { "tag": "h1", "editor": "input" },
-    "$.content": { "tag": "p", "editor": "textarea" },
-    "$.author.name": { "tag": "span", "editor": "input" },
-    "$.author.email": { "tag": "span", "editor": "input" },
-    "$.tags[*]": { "tag": "span", "editor": "input" }
+    '$.title': { tag: 'h1', editor: 'input' },
+    '$.content': { tag: 'p', editor: 'textarea' },
+    '$.author.name': { tag: 'span', editor: 'input' },
+    '$.author.email': { tag: 'span', editor: 'input' },
+    '$.tags[*]': { tag: 'span', editor: 'input' },
   },
   layout: {
-    "/author": {
-      "tag": "div",
-      "static": {
-        "before": [{ "tag": "h3", "content": "作者信息" }]
-      }
-    }
-  }
+    '/author': {
+      tag: 'div',
+      static: {
+        before: [{ tag: 'h3', content: '作者信息' }],
+      },
+    },
+  },
 })
 
 // 可选的 Zod 验证 schema
@@ -108,9 +109,9 @@ const documentSchema = z.object({
   content: z.string(),
   author: z.object({
     name: z.string(),
-    email: z.string().email()
+    email: z.string().email(),
   }),
-  tags: z.array(z.string())
+  tags: z.array(z.string()),
 })
 
 function handleDocChange(newDocument) {
@@ -151,43 +152,45 @@ Presentation Schema 定义了如何将 JSON 数据映射到 HTML 元素和编辑
 const presentationSchema = {
   rules: {
     // 基础字段映射
-    "$.title": { 
-      "tag": "h1",           // 渲染为 h1 标签
-      "editor": "input"      // 编辑时使用 input 控件
+    '$.title': {
+      tag: 'h1', // 渲染为 h1 标签
+      editor: 'input', // 编辑时使用 input 控件
     },
-    
+
     // 嵌套对象字段
-    "$.author.name": { 
-      "tag": "span", 
-      "editor": "input" 
+    '$.author.name': {
+      tag: 'span',
+      editor: 'input',
     },
-    
+
     // 数组元素（通配符）
-    "$.tags[*]": { 
-      "tag": "span", 
-      "editor": "input" 
+    '$.tags[*]': {
+      tag: 'span',
+      editor: 'input',
     },
-    
+
     // 特定数组索引
-    "$.items[0].name": { 
-      "tag": "h3", 
-      "editor": "input" 
+    '$.items[0].name': {
+      tag: 'h3',
+      editor: 'input',
     },
-    
+
     // 图片字段（使用 useValueAs 属性）
-    "$.avatar": {
-      "tag": "img",
-      "useValueAs": "src"    // 将字段值作为 src 属性
-    }
-  }
+    '$.avatar': {
+      tag: 'img',
+      useValueAs: 'src', // 将字段值作为 src 属性
+    },
+  },
 }
 ```
 
 **支持的编辑器类型：**
+
 - `"input"` - 单行文本输入框
 - `"textarea"` - 多行文本输入框
 
 **支持的 HTML 标签：**
+
 - 任何有效的 HTML 标签（h1, h2, p, span, div, img 等）
 
 #### 2. Layout（布局）
@@ -197,19 +200,17 @@ const presentationSchema = {
 ```javascript
 const presentationSchema = {
   layout: {
-    "/author": {
-      "tag": "div",
-      "static": {
-        "before": [
-          { "tag": "h3", "content": "作者信息" },
-          { "tag": "hr", "content": "" }
+    '$.author': {
+      tag: 'div',
+      static: {
+        before: [
+          { tag: 'h3', content: '作者信息' },
+          { tag: 'hr', content: '' },
         ],
-        "after": [
-          { "tag": "small", "content": "最后更新时间：2024-01-01" }
-        ]
-      }
-    }
-  }
+        after: [{ tag: 'small', content: '最后更新时间：2024-01-01' }],
+      },
+    },
+  },
 }
 ```
 
@@ -221,23 +222,20 @@ const presentationSchema = {
 import { z } from 'zod'
 
 const documentSchema = z.object({
-  title: z.string()
-    .min(1, "标题不能为空")
-    .max(100, "标题长度不能超过100字符"),
-  
-  content: z.string()
-    .min(10, "内容至少需要10个字符"),
-  
+  title: z.string().min(1, '标题不能为空').max(100, '标题长度不能超过100字符'),
+
+  content: z.string().min(10, '内容至少需要10个字符'),
+
   author: z.object({
-    name: z.string().min(1, "作者姓名不能为空"),
-    email: z.string().email("请输入有效的邮箱地址")
+    name: z.string().min(1, '作者姓名不能为空'),
+    email: z.string().email('请输入有效的邮箱地址'),
   }),
-  
-  tags: z.array(z.string()).min(1, "至少需要一个标签"),
-  
-  publishDate: z.string().datetime("请输入有效的日期时间"),
-  
-  status: z.enum(["draft", "published", "archived"])
+
+  tags: z.array(z.string()).min(1, '至少需要一个标签'),
+
+  publishDate: z.string().datetime('请输入有效的日期时间'),
+
+  status: z.enum(['draft', 'published', 'archived']),
 })
 ```
 
@@ -248,16 +246,16 @@ const documentSchema = z.object({
 ```javascript
 const jsonData = {
   items: [
-    { name: "项目1", value: 100 },
-    { name: "项目2", value: 200 }
-  ]
+    { name: '项目1', value: 100 },
+    { name: '项目2', value: 200 },
+  ],
 }
 
 const presentationSchema = {
   rules: {
-    "$.items[*].name": { "tag": "h4", "editor": "input" },
-    "$.items[*].value": { "tag": "span", "editor": "input" }
-  }
+    '$.items[*].name': { tag: 'h4', editor: 'input' },
+    '$.items[*].value': { tag: 'span', editor: 'input' },
+  },
 }
 ```
 
@@ -274,12 +272,12 @@ const presentationSchema = {
 1.  **获取组件实例**: 使用 `ref` 标记 `<JsonDocument>` 组件。
 2.  **触发预览**: 当你的应用从外部（例如 AI 服务）获得一个 `JSON Patch` 后，调用组件实例的 `previewChanges(patch)` 方法。
 3.  **进入预览模式**:
-    *   组件会触发 `@preview-start` 事件。
-    *   所有被 `patch` 影响的字段将在UI上高亮显示。
-    *   此时，原始数据**不会**被修改。
+    - 组件会触发 `@preview-start` 事件。
+    - 所有被 `patch` 影响的字段将在UI上高亮显示。
+    - 此时，原始数据**不会**被修改。
 4.  **用户决策**:
-    *   如果用户决定**接受**，你调用 `acceptChanges()` 方法。组件会触发 `@preview-accept` 和 `@change` 事件，并将变更应用到原始数据。
-    *   如果用户决定**拒绝**，你调用 `rejectChanges()` 方法。组件会触发 `@preview-reject` 事件，UI恢复到原始状态。
+    - 如果用户决定**接受**，你调用 `acceptChanges()` 方法。组件会触发 `@preview-accept` 和 `@change` 事件，并将变更应用到原始数据。
+    - 如果用户决定**拒绝**，你调用 `rejectChanges()` 方法。组件会触发 `@preview-reject` 事件，UI恢复到原始状态。
 
 ### 示例代码
 
@@ -291,7 +289,7 @@ const presentationSchema = {
       <button v-if="isInPreview" @click="accept">✅ 接受</button>
       <button v-if="isInPreview" @click="reject">❌ 拒绝</button>
     </div>
-    
+
     <JsonDocument
       ref="jsonDocRef"
       :json-data="jsonData"
@@ -304,42 +302,42 @@ const presentationSchema = {
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
 
-const jsonDocRef = ref(null);
-const isInPreview = ref(false);
+const jsonDocRef = ref(null)
+const isInPreview = ref(false)
 
 const jsonData = ref({
-  title: "AI协同编辑器",
-  description: "点击按钮，模拟AI提出的修改建议。"
-});
+  title: 'AI协同编辑器',
+  description: '点击按钮，模拟AI提出的修改建议。',
+})
 
 const presentationSchema = ref({
   rules: {
-    "$.title": { "tag": "h1", "editor": "input" },
-    "$.description": { "tag": "p", "editor": "textarea" }
-  }
-});
+    '$.title': { tag: 'h1', editor: 'input' },
+    '$.description': { tag: 'p', editor: 'textarea' },
+  },
+})
 
 // 模拟从 AI 服务获取 patch
 function triggerAIEdit() {
-  if (!jsonDocRef.value) return;
+  if (!jsonDocRef.value) return
 
   const aiGeneratedPatch = [
     { op: 'replace', path: '/title', value: 'AI 增强的标题' },
-    { op: 'replace', path: '/description', value: '这段描述由 AI 进行了优化，使其更具吸引力。' }
-  ];
+    { op: 'replace', path: '/description', value: '这段描述由 AI 进行了优化，使其更具吸引力。' },
+  ]
 
   // 调用组件方法，进入预览模式
-  jsonDocRef.value.previewChanges(aiGeneratedPatch);
+  jsonDocRef.value.previewChanges(aiGeneratedPatch)
 }
 
 function accept() {
-  jsonDocRef.value?.acceptChanges();
+  jsonDocRef.value?.acceptChanges()
 }
 
 function reject() {
-  jsonDocRef.value?.rejectChanges();
+  jsonDocRef.value?.rejectChanges()
 }
 </script>
 
@@ -358,33 +356,33 @@ function reject() {
 
 ### Props
 
-| 属性名 | 类型 | 必需 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `json-data` | `Object` | ✅ | - | 要渲染的 JSON 数据，作为单一数据源 |
-| `presentation-schema` | `Object` | ✅ | - | 展示模式配置，定义 JSONPath 到 HTML 的映射规则 |
-| `document-schema` | `ZodSchema` | ❌ | `null` | Zod 验证模式，用于数据验证和默认值生成 |
-| `readonly` | `Boolean` | ❌ | `false` | 是否为只读模式，禁用所有编辑和预览功能 |
+| 属性名                | 类型        | 必需 | 默认值  | 说明                                           |
+| --------------------- | ----------- | ---- | ------- | ---------------------------------------------- |
+| `json-data`           | `Object`    | ✅   | -       | 要渲染的 JSON 数据，作为单一数据源             |
+| `presentation-schema` | `Object`    | ✅   | -       | 展示模式配置，定义 JSONPath 到 HTML 的映射规则 |
+| `document-schema`     | `ZodSchema` | ❌   | `null`  | Zod 验证模式，用于数据验证和默认值生成         |
+| `readonly`            | `Boolean`   | ❌   | `false` | 是否为只读模式，禁用所有编辑和预览功能         |
 
 ### 暴露的方法 (Exposed Methods)
 
 通过组件 `ref` 调用这些方法：
 
-| 方法名 | 参数 | 返回值 | 说明 |
-|--------------|-------------------------|----------|----------------------------------------------------|
-| `previewChanges` | `patch: JSONPatch \| JSONPatch[]` | `void` | 进入预览模式，高亮显示变更但不应用到原始数据 |
-| `acceptChanges` | - | `void` | 接受当前预览的变更，应用到原始数据并触发 change 事件 |
-| `rejectChanges` | - | `void` | 拒绝当前预览的变更，恢复到原始状态 |
-| `isPreviewing` | - | `ComputedRef<boolean>` | 只读属性，指示是否处于预览模式 |
-| `highlightedPaths` | - | `ComputedRef<string[]>` | 只读属性，返回当前高亮显示的路径数组 |
+| 方法名             | 参数                              | 返回值                  | 说明                                                 |
+| ------------------ | --------------------------------- | ----------------------- | ---------------------------------------------------- |
+| `previewChanges`   | `patch: JSONPatch \| JSONPatch[]` | `void`                  | 进入预览模式，高亮显示变更但不应用到原始数据         |
+| `acceptChanges`    | -                                 | `void`                  | 接受当前预览的变更，应用到原始数据并触发 change 事件 |
+| `rejectChanges`    | -                                 | `void`                  | 拒绝当前预览的变更，恢复到原始状态                   |
+| `isPreviewing`     | -                                 | `ComputedRef<boolean>`  | 只读属性，指示是否处于预览模式                       |
+| `highlightedPaths` | -                                 | `ComputedRef<string[]>` | 只读属性，返回当前高亮显示的路径数组                 |
 
 ### 事件 (Events)
 
-| 事件名 | 载荷类型 | 触发时机 | 说明 |
-|----------------|------------------------------------------------|--------------------------|----------------------------------------------------------|
-| `@change` | `newDocument: Record<string, any>` | 文档数据永久变更时 | 用户编辑或接受预览变更后触发，可用于保存数据 |
-| `@preview-start` | `{ patch: JSONPatch[], highlightedPaths: string[] }` | 调用 `previewChanges` 成功后 | 进入预览模式，可显示接受/拒绝按钮 |
-| `@preview-accept`| `{ patch: JSONPatch[] }` | 调用 `acceptChanges` 后 | 用户接受预览变更，可隐藏预览相关UI |
-| `@preview-reject`| - | 调用 `rejectChanges` 后 | 用户拒绝预览变更，可隐藏预览相关UI |
+| 事件名            | 载荷类型                                             | 触发时机                     | 说明                                         |
+| ----------------- | ---------------------------------------------------- | ---------------------------- | -------------------------------------------- |
+| `@change`         | `newDocument: Record<string, any>`                   | 文档数据永久变更时           | 用户编辑或接受预览变更后触发，可用于保存数据 |
+| `@preview-start`  | `{ patch: JSONPatch[], highlightedPaths: string[] }` | 调用 `previewChanges` 成功后 | 进入预览模式，可显示接受/拒绝按钮            |
+| `@preview-accept` | `{ patch: JSONPatch[] }`                             | 调用 `acceptChanges` 后      | 用户接受预览变更，可隐藏预览相关UI           |
+| `@preview-reject` | -                                                    | 调用 `rejectChanges` 后      | 用户拒绝预览变更，可隐藏预览相关UI           |
 
 ### JSON Patch 格式
 
@@ -394,7 +392,7 @@ function reject() {
 // 添加操作
 { op: "add", path: "/items/-", value: { name: "新项目" } }
 
-// 替换操作  
+// 替换操作
 { op: "replace", path: "/title", value: "新标题" }
 
 // 删除操作
@@ -411,6 +409,7 @@ function reject() {
 ```
 
 **路径说明：**
+
 - 使用 JSON Pointer 格式（RFC 6901）
 - `/` 表示根对象
 - `/title` 表示根对象的 title 属性
@@ -423,11 +422,7 @@ function reject() {
 
 ```vue
 <template>
-  <JsonDocument
-    :json-data="jsonData"
-    :presentation-schema="presentationSchema"
-    :readonly="true"
-  />
+  <JsonDocument :json-data="jsonData" :presentation-schema="presentationSchema" :readonly="true" />
 </template>
 ```
 
@@ -469,32 +464,32 @@ import { ref } from 'vue'
 import { z } from 'zod'
 
 const article = ref({
-  title: "我的博客文章",
-  content: "文章内容...",
-  tags: ["Vue", "前端"],
+  title: '我的博客文章',
+  content: '文章内容...',
+  tags: ['Vue', '前端'],
   metadata: {
-    author: "作者姓名",
-    publishDate: "2024-01-01",
-    category: "技术"
-  }
+    author: '作者姓名',
+    publishDate: '2024-01-01',
+    category: '技术',
+  },
 })
 
 const blogSchema = {
   rules: {
-    "$.title": { "tag": "h1", "editor": "input" },
-    "$.content": { "tag": "div", "editor": "textarea" },
-    "$.tags[*]": { "tag": "span", "editor": "input" },
-    "$.metadata.author": { "tag": "span", "editor": "input" },
-    "$.metadata.category": { "tag": "span", "editor": "input" }
+    '$.title': { tag: 'h1', editor: 'input' },
+    '$.content': { tag: 'div', editor: 'textarea' },
+    '$.tags[*]': { tag: 'span', editor: 'input' },
+    '$.metadata.author': { tag: 'span', editor: 'input' },
+    '$.metadata.category': { tag: 'span', editor: 'input' },
   },
   layout: {
-    "/metadata": {
-      "tag": "aside",
-      "static": {
-        "before": [{ "tag": "h3", "content": "文章信息" }]
-      }
-    }
-  }
+    '$.metadata': {
+      tag: 'aside',
+      static: {
+        before: [{ tag: 'h3', content: '文章信息' }],
+      },
+    },
+  },
 }
 
 const articleSchema = z.object({
@@ -504,8 +499,8 @@ const articleSchema = z.object({
   metadata: z.object({
     author: z.string().min(1),
     publishDate: z.string(),
-    category: z.string()
-  })
+    category: z.string(),
+  }),
 })
 
 function saveArticle(updatedArticle) {
@@ -532,26 +527,26 @@ function saveArticle(updatedArticle) {
 <script setup>
 const appConfig = ref({
   database: {
-    host: "localhost",
+    host: 'localhost',
     port: 5432,
-    name: "myapp_db"
+    name: 'myapp_db',
   },
   cache: {
     enabled: true,
-    ttl: 3600
+    ttl: 3600,
   },
-  features: ["analytics", "notifications"]
+  features: ['analytics', 'notifications'],
 })
 
 const configSchema = {
   rules: {
-    "$.database.host": { "tag": "code", "editor": "input" },
-    "$.database.port": { "tag": "code", "editor": "input" },
-    "$.database.name": { "tag": "code", "editor": "input" },
-    "$.cache.enabled": { "tag": "span", "editor": "input" },
-    "$.cache.ttl": { "tag": "span", "editor": "input" },
-    "$.features[*]": { "tag": "span", "editor": "input" }
-  }
+    '$.database.host': { tag: 'code', editor: 'input' },
+    '$.database.port': { tag: 'code', editor: 'input' },
+    '$.database.name': { tag: 'code', editor: 'input' },
+    '$.cache.enabled': { tag: 'span', editor: 'input' },
+    '$.cache.ttl': { tag: 'span', editor: 'input' },
+    '$.features[*]': { tag: 'span', editor: 'input' },
+  },
 }
 </script>
 ```
@@ -561,26 +556,24 @@ const configSchema = {
 库提供完整的 TypeScript 类型定义：
 
 ```typescript
-import type { 
+import type {
   JsonDocumentProps,
   PresentationSchema,
   JsonPatch,
-  JsonDocumentExposedMethods
+  JsonDocumentExposedMethods,
 } from 'vue-json-document'
 import { ref } from 'vue'
 
 const jsonDocRef = ref<JsonDocumentExposedMethods | null>(null)
 
 // 调用方法时享受完整的类型提示
-jsonDocRef.value?.previewChanges([
-  { op: 'replace', path: '/title', value: '新标题' }
-])
+jsonDocRef.value?.previewChanges([{ op: 'replace', path: '/title', value: '新标题' }])
 
 // 类型安全的 Schema 定义
 const schema: PresentationSchema = {
   rules: {
-    "$.title": { tag: "h1", editor: "input" }
-  }
+    '$.title': { tag: 'h1', editor: 'input' },
+  },
 }
 ```
 
@@ -589,6 +582,7 @@ const schema: PresentationSchema = {
 ### 常见问题
 
 **Q: 组件无法渲染内容**
+
 ```javascript
 // ✅ 确保正确导入组件和样式
 import { JsonDocument } from 'vue-json-document'
@@ -600,6 +594,7 @@ app.use(createPinia())
 ```
 
 **Q: JSONPath 规则不生效**
+
 ```javascript
 // ❌ 错误的 JSONPath 语法
 "title": { "tag": "h1" }
@@ -609,6 +604,7 @@ app.use(createPinia())
 ```
 
 **Q: 数组操作按钮不显示**
+
 ```javascript
 // ✅ 确保 readonly 为 false
 <JsonDocument :readonly="false" />
@@ -618,9 +614,10 @@ app.use(createPinia())
 ```
 
 **Q: Zod 验证错误**
+
 ```javascript
 // ✅ 确保数据结构与 Schema 匹配
-const data = { title: "string" }  // 与 z.object({ title: z.string() }) 匹配
+const data = { title: 'string' } // 与 z.object({ title: z.string() }) 匹配
 ```
 
 ### 调试技巧
@@ -637,13 +634,13 @@ const data = { title: "string" }  // 与 z.object({ title: z.string() }) 匹配
 ```javascript
 // 对于大型 JSON 文档，考虑分页或虚拟滚动
 const largeData = ref({
-  items: [] // 避免一次加载过多数组项
+  items: [], // 避免一次加载过多数组项
 })
 
 // 使用计算属性来过滤显示的数据
 const displayedData = computed(() => ({
   ...largeData.value,
-  items: largeData.value.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+  items: largeData.value.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize),
 }))
 ```
 

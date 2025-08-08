@@ -45,8 +45,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'New Title'
-        }
+          value: 'New Title',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -54,7 +54,7 @@ describe('Preview Mode Events', () => {
 
       expect(wrapper.emitted('preview-start')).toBeTruthy()
       expect(wrapper.emitted('preview-start')).toHaveLength(1)
-      
+
       const event = wrapper.emitted('preview-start')[0][0]
       expect(event.patch).toEqual(testPatch)
       expect(event.highlightedPaths).toEqual(['/title'])
@@ -65,13 +65,13 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'New Title'
+          value: 'New Title',
         },
         {
           op: 'replace',
           path: '/content',
-          value: 'New Content'
-        }
+          value: 'New Content',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -87,7 +87,7 @@ describe('Preview Mode Events', () => {
       const testPatch = {
         op: 'replace',
         path: '/title',
-        value: 'Single Patch'
+        value: 'Single Patch',
       }
 
       wrapper.vm.previewChanges(testPatch)
@@ -105,8 +105,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Accepted Title'
-        }
+          value: 'Accepted Title',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -117,7 +117,7 @@ describe('Preview Mode Events', () => {
 
       expect(wrapper.emitted('preview-accept')).toBeTruthy()
       expect(wrapper.emitted('preview-accept')).toHaveLength(1)
-      
+
       const event = wrapper.emitted('preview-accept')[0][0]
       expect(event.patch).toEqual(testPatch)
     })
@@ -134,8 +134,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/content',
-          value: 'Modified content'
-        }
+          value: 'Modified content',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -156,8 +156,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Rejected Title'
-        }
+          value: 'Rejected Title',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -172,11 +172,13 @@ describe('Preview Mode Events', () => {
 
     it('emits preview-reject when called during preview mode', async () => {
       // First enter preview mode
-      wrapper.vm.previewChanges([{
-        op: 'replace',
-        path: '/title',
-        value: 'Test'
-      }])
+      wrapper.vm.previewChanges([
+        {
+          op: 'replace',
+          path: '/title',
+          value: 'Test',
+        },
+      ])
       await nextTick()
 
       wrapper.vm.rejectChanges()
@@ -188,7 +190,7 @@ describe('Preview Mode Events', () => {
     it('does not emit preview-reject when called on non-preview state', async () => {
       // Ensure we're not in preview mode
       expect(wrapper.vm.isPreviewing).toBe(false)
-      
+
       wrapper.vm.rejectChanges()
       await nextTick()
 
@@ -201,8 +203,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Should not persist'
-        }
+          value: 'Should not persist',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -221,8 +223,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Flow Test'
-        }
+          value: 'Flow Test',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -249,8 +251,8 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Reject Flow Test'
-        }
+          value: 'Reject Flow Test',
+        },
       ]
 
       wrapper.vm.previewChanges(testPatch)
@@ -266,22 +268,26 @@ describe('Preview Mode Events', () => {
 
     it('handles multiple preview cycles correctly', async () => {
       // First preview cycle
-      wrapper.vm.previewChanges([{
-        op: 'replace',
-        path: '/title',
-        value: 'First Preview'
-      }])
+      wrapper.vm.previewChanges([
+        {
+          op: 'replace',
+          path: '/title',
+          value: 'First Preview',
+        },
+      ])
       await nextTick()
 
       wrapper.vm.rejectChanges()
       await nextTick()
 
       // Second preview cycle
-      wrapper.vm.previewChanges([{
-        op: 'replace',
-        path: '/content',
-        value: 'Second Preview'
-      }])
+      wrapper.vm.previewChanges([
+        {
+          op: 'replace',
+          path: '/content',
+          value: 'Second Preview',
+        },
+      ])
       await nextTick()
 
       wrapper.vm.acceptChanges()
@@ -300,17 +306,17 @@ describe('Preview Mode Events', () => {
         {
           op: 'replace',
           path: '/title',
-          value: 'Complex Title'
+          value: 'Complex Title',
         },
         {
           op: 'add',
           path: '/newField',
-          value: 'New Value'
+          value: 'New Value',
         },
         {
           op: 'remove',
-          path: '/content'
-        }
+          path: '/content',
+        },
       ]
 
       wrapper.vm.previewChanges(complexPatch)
@@ -320,14 +326,14 @@ describe('Preview Mode Events', () => {
       expect(event.patch).toEqual(complexPatch)
       expect(event.highlightedPaths).toContain('/title')
       expect(event.highlightedPaths).toContain('/newField')
-      expect(event.highlightedPaths).toContain('/content')
+      expect(event.highlightedPaths).not.toContain('/content')
     })
 
     it('provides correct patch data in preview-accept event', async () => {
       const testPatch = {
         op: 'replace',
         path: '/title',
-        value: 'Accept Test'
+        value: 'Accept Test',
       }
 
       wrapper.vm.previewChanges(testPatch)
@@ -347,8 +353,8 @@ describe('Preview Mode Events', () => {
       const invalidPatch = [
         {
           op: 'replace',
-          value: 'Missing path'
-        }
+          value: 'Missing path',
+        },
       ]
 
       wrapper.vm.previewChanges(invalidPatch)

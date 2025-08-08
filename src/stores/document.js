@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import JSONPath from 'jsonpath'
 import { applyPatch, deepClone } from 'fast-json-patch'
 
 export const useDocumentStore = defineStore('document', {
@@ -40,6 +41,17 @@ export const useDocumentStore = defineStore('document', {
       }
 
       return current
+    },
+
+    // Provide JSONPath querying capability (optional helper)
+    getNodesByJSONPath: (state) => (jsonPath) => {
+      if (!state.document) return []
+      try {
+        return JSONPath.nodes(state.document, jsonPath)
+      } catch (error) {
+        console.warn(`Error querying JSONPath '${jsonPath}':`, error)
+        return []
+      }
     },
   },
 

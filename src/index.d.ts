@@ -28,6 +28,7 @@ export interface ArrayControlProps {
 // Schema Types
 export interface PresentationSchema {
   rules?: Record<string, PresentationRule>
+  // Keys can be JSON Pointer (legacy) or JSONPath expressions
   layout?: Record<string, LayoutRule>
 }
 
@@ -65,6 +66,8 @@ export interface DocumentStore extends Store<'document', DocumentState> {
   setDocument(doc: Record<string, any>): void
   setDocumentSchema(schema: any): void
   getNodeByPointer(pointer: string): any
+  // Optional helper for JSONPath queries
+  getNodesByJSONPath(jsonPath: string): Array<{ path: (string | number)[]; value: any }>
   applyPatch(patch: JsonPatch): boolean
   validateDocument(): boolean
   clearErrors(): void
@@ -92,7 +95,7 @@ export interface JsonDocumentEvents {
 
 // Component Exports
 export declare const JsonDocument: DefineComponent<JsonDocumentProps, {}, {}, {}, {}, {}, {}, JsonDocumentEvents> & {
-  new (): JsonDocumentInstance
+  new(): JsonDocumentInstance
 }
 export declare const NodeRenderer: DefineComponent<NodeRendererProps>
 export declare const EditableField: DefineComponent<EditableFieldProps>

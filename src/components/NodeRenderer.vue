@@ -112,9 +112,26 @@ const matchingRule = computed(() => {
   return null
 })
 
-// Find layout rule
+// Find layout rule (support JSONPath patterns, keep exact match for backward compatibility)
 const layoutRule = computed(() => {
-  return props.schema.layout?.[props.path] || null
+  if (!props.schema.layout || !documentStore.document) return null
+
+  // Backward compatibility: exact JSON Pointer match
+  if (props.schema.layout[props.path]) {
+    return props.schema.layout[props.path]
+  }
+
+  // JSONPath-based matching
+  for (const [layoutPattern, rule] of Object.entries(props.schema.layout)) {
+    // Only try JSONPath matching when the key looks like a JSONPath expression
+    if (typeof layoutPattern === 'string' && layoutPattern.startsWith('$')) {
+      if (matchesPattern(layoutPattern, props.path)) {
+        return rule
+      }
+    }
+  }
+
+  return null
 })
 
 // Determine the render tag

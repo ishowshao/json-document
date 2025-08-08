@@ -36,10 +36,7 @@ npm link vue-json-document
 <template>
   <div>
     <h1>测试 Vue JSON Document</h1>
-    <JsonDocument
-      :json-data="jsonData"
-      :presentation-schema="schema"
-    />
+    <JsonDocument :json-data="jsonData" :presentation-schema="schema" />
   </div>
 </template>
 
@@ -48,20 +45,20 @@ import { JsonDocument } from 'vue-json-document'
 import 'vue-json-document/dist/vue-json-document.css'
 
 const jsonData = {
-  title: "本地测试文档",
-  description: "这是使用 npm link 的测试",
-  items: ["项目一", "项目二", "项目三"]
+  title: '本地测试文档',
+  description: '这是使用 npm link 的测试',
+  items: ['项目一', '项目二', '项目三'],
 }
 
 const schema = {
   rules: {
-    "$.title": { tag: "h2", editor: "input" },
-    "$.description": { tag: "p", editor: "textarea" },
-    "$.items[*]": { tag: "li", editor: "input" }
+    '$.title': { tag: 'h2', editor: 'input' },
+    '$.description': { tag: 'p', editor: 'textarea' },
+    '$.items[*]': { tag: 'li', editor: 'input' },
   },
   layout: {
-    "/items": { tag: "ul" }
-  }
+    '$.items': { tag: 'ul' },
+  },
 }
 </script>
 ```
@@ -89,6 +86,7 @@ npm unlink -g vue-json-document
 
 **Q: `npm link vue-json-document` 报错 404 Not Found？**
 A: 这个错误通常出现但不影响功能！请检查：
+
 - 是否有软链接：`ls -la node_modules/ | grep vue-json-document`
 - 使用ES模块语法导入：`import { JsonDocument } from 'vue-json-document'`
 - 如果是CommonJS项目，需要用动态导入：`const m = await import('vue-json-document')`
@@ -98,6 +96,7 @@ A: 重新运行 `npm run build:lib` 构建最新版本。
 
 **Q: 链接后找不到组件？**
 A: 确保：
+
 - 已运行 `npm run build:lib`
 - package.json 中的 main/module/exports 路径正确
 - 测试项目中正确导入了 CSS 文件
@@ -108,6 +107,7 @@ A: 确保 `dist/index.d.ts` 文件存在且 package.json 中 types 字段配置�
 
 **Q: 导入时提示 Cannot read properties of undefined？**
 A: 使用ES模块语法：
+
 ```javascript
 // ✅ 正确
 import { JsonDocument, docs } from 'vue-json-document'

@@ -235,19 +235,19 @@ const schemaInput = ref(`{
     }
   },
   "layout": {
-    "/authors": {
+    "$.authors": {
       "tag": "ul",
       "static": {
         "before": [{ "tag": "h2", "content": "作者" }]
       }
     },
-    "/paragraphs/*/content/features": {
+    "$.paragraphs[*].content.features": {
       "tag": "ul",
       "static": {
         "before": [{ "tag": "h3", "content": "特性" }]
       }
     },
-    "/paragraphs/*/content/metadata": {
+    "$.paragraphs[*].content.metadata": {
       "tag": "div",
       "static": {
         "before": [{ "tag": "h4", "content": "元数据" }],
